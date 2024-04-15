@@ -12,6 +12,7 @@ import { DrawerPropType } from 'entities/interfaces'
 import { Unstable_Popup } from '@mui/base/Unstable_Popup';
 import LogoutIcon from 'assets/icons/Logout.png'
 import LogoutIconDark from 'assets/icons/Logout-dark.png'
+import { useNavigate } from 'react-router-dom'
 
 const HeaderBox = styled(Box)(({ theme }) => ({
   backgroundColor: theme.palette.common.white,
@@ -30,10 +31,10 @@ const UserIcon = styled('button')<{ size?: string }>(({ theme }) => ({
   borderRadius: '50%',
   width: '3rem',
   height: '3rem',
-  color: '#0F0F0F',
   fontWeight: 500,
-  fontSize: '2rem',
-  border: 'none'
+  fontSize: '1.5rem',
+  border: 'none',
+  color: theme.palette.common.white
 }))
 
 const TitleBox = styled(Box)(({ theme }) => ({
@@ -82,6 +83,7 @@ const OptionsArrowBox = styled(Box)(({ theme }) => ({
 }))
 
 const Header = ({ data, isSetting = false }: { data?: DrawerPropType, isSetting?: boolean }) => {
+  const navigate = useNavigate()
   const { width } = useScreenSize()
   const { t } = useTranslation()
   const theme = useTheme()
@@ -96,6 +98,12 @@ const Header = ({ data, isSetting = false }: { data?: DrawerPropType, isSetting?
 
   const open = Boolean(anchor);
   const id = open ? 'simple-popper' : undefined;
+
+  const handleLogout = () => {
+    localStorage.removeItem('currentUserToken')
+    localStorage.removeItem('currentUserName')
+    navigate('/auth')
+  }
 
   return (
     <HeaderBox justifyContent={width > MobileWidth ? 'flex-start' : 'space-between'} >
@@ -123,7 +131,7 @@ const Header = ({ data, isSetting = false }: { data?: DrawerPropType, isSetting?
           <UserIcon size='3rem' sx={{ fontSize: '1.5rem' }}>{window.localStorage.getItem("currentUserName")?.charAt(0)}</UserIcon>
           <OptionsPopup id={id} open={open} anchor={anchor}>
             <OptionsBox>
-              <Option sx={{ fontSize: TextSizes[textSize].subhead }}  onClick={() => {}} >
+              <Option sx={{ fontSize: TextSizes[textSize].subhead }}  onClick={handleLogout} >
                 <ImageComponent src={theme.palette.mode==='light'?LogoutIcon:LogoutIconDark} alt='icon' width='1.25rem' height='1.25rem' />
                 {t('Logout')}
               </Option>

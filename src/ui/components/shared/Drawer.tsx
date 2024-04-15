@@ -14,11 +14,12 @@ const Wrapper = styled(Box)(({ theme }) => ({
     height: '100%',
     width: '17.62rem',
     gap: '2.5rem',
-    boxShadow: `2px 2px 4px rgba(0, 0, 0, 0.07)`,
+    flexShrink: 0,
+    // boxShadow: `0px 2px 2px rgba(0, 0, 0, 0.2)`,
     overflowY: "auto",
     "&::-webkit-scrollbar": {
-        width: "0.4rem",
-        height: '0.4rem',
+        width: "0.2rem",
+        height: '0.2rem',
     },
     "&::-webkit-scrollbar-track": {
         background: 'transparent',
@@ -36,7 +37,7 @@ const Wrapper = styled(Box)(({ theme }) => ({
 const ListElement = styled(ListItem)<{ active?: string }>(({ theme, active }) => ({
     padding: 0,
     backgroundColor: active ? theme.palette.grey[800] : 'none',
-    borderRight: `3px solid ${active ? theme.palette.primary.main : 'transparent'}`
+    borderRight: `3px solid ${active ? theme.palette.primary.main : 'transparent'}`,
 }))
 
 
@@ -48,11 +49,12 @@ const ListButton = styled(ListItemButton)(() => ({
 
 const ListBox = styled(Box)(() => ({
     display: 'flex',
+    flexGrow:1,
     height: '6.25rem',
     padding: '4px 0px 4px 20px',
     justifyContent: 'space-between',
     alignItems: 'center',
-    cursor: 'pointer'
+    cursor: 'pointer',
 }))
 
 const TitleBox = styled(Box)(() => ({

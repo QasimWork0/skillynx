@@ -1,9 +1,11 @@
-import React from "react";
+import React, { useState } from "react";
 import { Box, styled } from "@mui/material";
-import ChatComponent from "../../home/ChatComponent";
+import ChatComponent from "../../../chat/ChatComponent";
 import useScreenSize from "hooks/ScreenSize";
 import { MobileWidth } from "entities/constants";
-import ChatComponentMobile from "ui/components/mobile/home/ChatComponentMobile";
+import ChatComponentMobile from "ui/components/chat/ChatComponentMobile";
+import WithFeedbackTabData from "ui/containers/settings/FeedbackTabContainer";
+import { FeedbackTabPropType } from "entities/interfaces";
 
 const WrapperBox = styled(Box)(({ theme }) => ({
   width: 'calc(100% + 4rem)',
@@ -11,13 +13,25 @@ const WrapperBox = styled(Box)(({ theme }) => ({
   margin: '0 -2rem',
 }));
 
-const FeedbackTab = () => {
-  const {width} = useScreenSize()
+const FeedbackTab = ({ feedbackData, addFeedback }: FeedbackTabPropType) => {
+  const { width } = useScreenSize()
+  const [sendDisabled, setSendDisabled] = useState(false);
+
+  const handleSendfeedback = async (content: string) => {
+    setSendDisabled(true)
+    await addFeedback(content)
+    setSendDisabled(false)
+  }
   return (
     <WrapperBox>
-      {width>MobileWidth? <ChatComponent />: <ChatComponentMobile/>}
+      {width > MobileWidth ?
+        <ChatComponent messagesData={feedbackData} sendMessage={handleSendfeedback}
+          sendDisabled={sendDisabled}
+        />
+        :
+        <ChatComponentMobile />}
     </WrapperBox>
   );
 };
 
-export default FeedbackTab;
+export default WithFeedbackTabData(FeedbackTab);

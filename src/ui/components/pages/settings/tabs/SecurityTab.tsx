@@ -9,6 +9,7 @@ import { SubmitButton } from "ui/components/shared/SubmitButton";
 import WithSecurityTabData from "ui/containers/settings/SecurityTabContainer";
 import { ChangePasswordInterface, SecurityTabPropType } from "entities/interfaces";
 import ConfirmationModal from "ui/components/shared/ConfirmationModal";
+import { useNavigate } from "react-router-dom";
 
 const WrapperBox = styled(Box)(() => ({
   display: "flex",
@@ -20,6 +21,7 @@ const WrapperBox = styled(Box)(() => ({
 }));
 
 const SecurityTab = ({ updatePassword, deleteAccount }: SecurityTabPropType) => {
+  const navigate = useNavigate()
   const { t } = useTranslation()
   const { width } = useScreenSize()
   const [formData, setFormData] = useState<ChangePasswordInterface>({
@@ -59,6 +61,15 @@ const SecurityTab = ({ updatePassword, deleteAccount }: SecurityTabPropType) => 
     }
   }
 
+  const handleDelete = async () => {
+    const resp = await deleteAccount()
+    if(resp.status === 200){
+      localStorage.removeItem('currentUserName')
+      localStorage.removeItem('currentUserToken')
+      navigate('/auth')
+    }
+  }
+
   return (
     <WrapperBox>
       <TitleBox title='Change Password' padding={width > MobileWidth ? "1rem 2rem" : '1rem'}
@@ -95,7 +106,7 @@ const SecurityTab = ({ updatePassword, deleteAccount }: SecurityTabPropType) => 
       </TitleBox>
       {deleteConfirmationModal &&
         <ConfirmationModal closeModal={() => setDeleteConfirmationModal(false)} confirmColor='error'
-          handleConfirm={deleteAccount} title='Deleting Account' description='Are you sure you want to delete this account?'
+          handleConfirm={handleDelete} title='Deleting Account' description='Are you sure you want to delete this account?'
         />
       }
     </WrapperBox>

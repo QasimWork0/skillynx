@@ -14,7 +14,7 @@ const SkillsWrapper = styled(Box)(() => ({
   display: "flex",
 }));
 
-const Skills = ({ courses, deleteUserCourse }: SkillsPropType) => {
+const Skills = ({ courses, deleteUserCourse, nodesData, handleCourseChange }: SkillsPropType) => {
   const { width } = useScreenSize()
   const [active, setActive] = useState<DrawerPropType>({
     title: "",
@@ -31,12 +31,17 @@ const Skills = ({ courses, deleteUserCourse }: SkillsPropType) => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [courses]);
 
+  useEffect(() => {
+    handleCourseChange(active.id?.toString()||'')
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [active]);
+
   return (
     <SkillsWrapper sx={{ flexDirection: 'column' }}>
       {width > MobileWidth ? (
         <>
           <Header data={active} />
-          <SkillsDesktop options={courses} active={active} setActive={setActive} deleteUserCourse={deleteUserCourse} />
+          <SkillsDesktop options={courses} active={active} setActive={setActive} deleteUserCourse={deleteUserCourse} nodesData={nodesData}/>
         </>
       ) : (
         <SkillsListView options={courses} active={active} setActive={setActive} deleteUserCourse={deleteUserCourse} />

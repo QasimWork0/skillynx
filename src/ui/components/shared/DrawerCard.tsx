@@ -13,8 +13,8 @@ import { Unstable_Popup } from '@mui/base/Unstable_Popup';
 const Wrapper = styled(Box)(({ theme }) => ({
     display: 'flex',
     alignItems: 'center',
-    gap: '1rem',
-    flex: '1'
+    gap: '0.75rem',
+    flexGrow: '1',
 }))
 
 const OptionsPopup = styled(Unstable_Popup)(({ theme }) => ({
@@ -43,13 +43,21 @@ const Option = styled(Button)(({ theme }) => ({
 
 const OptionsArrowBox = styled(Box)(({ theme }) => ({
     backgroundColor: theme.palette.common.white,
-    position:'absolute',
+    position: 'absolute',
     marginTop: '-15px',
     marginLeft: '82px',
     width: '12px',
     height: '12px',
     transform: 'rotate(45deg)',
     flexShrink: 0
+}))
+
+const SkillName = styled(Typography)(({ theme }) => ({
+    width: '8rem',
+    maxHeight: '3.2rem',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    // whiteSpace: 'nowrap',  
 }))
 
 const DrawerCard = ({ label, image, imageDark, courseId, menu = [], active = false, progress = 20, isSettings = false }: any) => {
@@ -75,7 +83,7 @@ const DrawerCard = ({ label, image, imageDark, courseId, menu = [], active = fal
                     value={Math.floor((progress / 12.5)) * 12.5}
                     strokeWidth={6}
                     styles={{
-                        root: { width: '4.6rem', height: '4.6rem', display: 'flex' },
+                        root: { width: '3.75rem', height: '3.75rem', display: 'flex' },
                         path: {
                             stroke: theme.palette.primary.main,
                             // strokeLinecap: 'round',
@@ -88,7 +96,7 @@ const DrawerCard = ({ label, image, imageDark, courseId, menu = [], active = fal
                         },
                     }}
                 >
-                    <ImageComponent src={image} alt='skill' width='3.75rem' height='3.75rem' borderRadius='50%' />
+                    <ImageComponent src={image} alt='skill' width='3.25rem' height='3.25rem' borderRadius='50%' />
                     <RadialSeparators
                         count={8}
                         style={{
@@ -99,18 +107,20 @@ const DrawerCard = ({ label, image, imageDark, courseId, menu = [], active = fal
                     />
                 </CircularProgressbarWithChildren>
             }
-            <Typography sx={{ fontWeight: active ? '700' : '400', fontSize: TextSizes[textSize].body, flexGrow: '1', paddingRight: '0.2rem' }}>{t(label)}</Typography>
+            <SkillName sx={{ fontWeight: active ? '700' : '400', fontSize: TextSizes[textSize].body }}>{t(label)}</SkillName>
             {!isSettings && active &&
-                <IconButton onClick={handleMore}>
-                    <ImageComponent src={theme.palette.mode === 'light' ? MoreIcon : MoreIconDark} alt='more' width='1.5rem' height='1.5rem' />
-                </IconButton>
+                <Box sx={{flex:1}}>
+                    <IconButton onClick={handleMore}>
+                        <ImageComponent src={theme.palette.mode === 'light' ? MoreIcon : MoreIconDark} alt='more' width='1.5rem' height='1.5rem' />
+                    </IconButton>
+                </Box>
             }
             <OptionsPopup id={id} open={open} anchor={anchor}>
                 <OptionsBox>
                     {menu.map((item: any, index: number) => (
                         <>
                             <Option key={index} sx={{ fontSize: TextSizes[textSize].subhead, color: item.color }}
-                                onClick={()=>item.clickHandler(courseId)}>
+                                onClick={() => item.clickHandler(courseId)}>
                                 <ImageComponent src={item.icon} alt='icon' width='1.25rem' height='1.25rem' />
                                 {item.title}
                             </Option>

@@ -188,7 +188,7 @@ const BookSkillCard = ({ bookCourse }: BookingCardPropType) => {
                                 <Sublabel fontSize={TextSizes[textSize].subhead}>{selectedSkill.subtitle}</Sublabel>
                             </Box>
                             <ScrollBox>
-                                <Text fontSize={TextSizes[textSize].subhead} dangerouslySetInnerHTML={{ __html: decodeURIComponent(selectedSkill.description) }}></Text>
+                                <Text fontSize={TextSizes[textSize].subhead} >{decodeURIComponent(selectedSkill.description)}</Text>
                                 <ChaptersBox>
                                     <Label2 fontSize={TextSizes[textSize].title3}>Chapter overview:</Label2>
                                     <ChaptersBox sx={{ gap: '0.25rem' }}>

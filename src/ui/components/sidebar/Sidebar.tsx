@@ -39,6 +39,12 @@ const Sidebar = () => {
   const { state: textSize } = useContext(TextSizeContext)
   const { t } = useTranslation()
 
+  const handleLogout = () => {
+    localStorage.removeItem('currentUserToken')
+    localStorage.removeItem('currentUserName')
+    navigate('/auth')
+  }
+
   return (
     <Drawer
       variant="permanent"
@@ -67,7 +73,7 @@ const Sidebar = () => {
           ))
         }
         <ListElement sx={{ position: 'fixed', bottom: '1rem', width: '5rem'}}>
-          <ListButton onClick={() => navigate('/auth')}>
+          <ListButton onClick={handleLogout}>
             <ImageComponent src={theme.palette.mode==='light'?LogoutIcon:LogoutIconDark} alt="logout" />
             <ListButtonText fontSize={TextSizes[textSize].footnote}>{t('Logout')}</ListButtonText>
           </ListButton>

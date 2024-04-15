@@ -12,27 +12,27 @@ export interface RoutesInterface {
 }
 
 export interface ResponseInterface<T> {
-  status: number
-  content: T,
-  message: string,
+  status: number;
+  content: T;
+  message: string;
 }
 
 export interface AlertInterface {
-  color: 'success'|'error'
-  message: string
+  color: "success" | "error";
+  message: string;
 }
 
 /***  Models  ***/
 export interface UserInterface {
-  firstName: string
-  lastName: string
-  email: string
-  image: string
+  firstName: string;
+  lastName: string;
+  email: string;
+  image: string;
 }
 
 export interface UserInfoInterface extends UserInterface {
-  token: string
-  access_count: number
+  token: string;
+  access_count: number;
 }
 
 export interface SkillCourseInterface {
@@ -41,17 +41,17 @@ export interface SkillCourseInterface {
   thumbnail: string;
   ordering: number;
   status: number;
-  state:number
+  state: number;
 }
 
 export interface ChapterInterface {
-  id: number
-  title: string
-  prompt: string
-  course_id: number
-  ordering: number
-  status: number
-  isBookmarked?: boolean
+  id: number;
+  title: string;
+  prompt: string;
+  course_id: number;
+  ordering: number;
+  status: number;
+  isBookmarked?: boolean;
 }
 
 export interface LibraryCourseInterface extends SkillCourseInterface {
@@ -64,7 +64,7 @@ export interface LibraryCourseInterface extends SkillCourseInterface {
 }
 
 export interface SkillboxCourseInterface extends SkillCourseInterface {
-  chapters: ChapterInterface[]
+  chapters: ChapterInterface[];
 }
 
 export interface HeaderTitleType {
@@ -73,22 +73,45 @@ export interface HeaderTitleType {
 }
 
 export interface NotficationSettingInterface {
-  notification1: 0|1|2|3
-  notification2: 0|1
-  notification3: 0|1
+  notification1: 0 | 1 | 2 | 3;
+  notification2: 0 | 1;
+  notification3: 0 | 1;
 }
 
 export interface ChangePasswordInterface {
-  oldPassword: string
-  newPassword: string
-  confirmPassword: string
+  oldPassword: string;
+  newPassword: string;
+  confirmPassword: string;
 }
+
+export interface FeedbackInterface {
+  feedback: string;
+  time: string;
+  direction: string;
+}
+
+export interface ParagraphInterface {
+  content: string
+  id: number
+  outputs: string
+  prompt: string
+  prompt_type: string
+  section_id: number
+  settings: string
+  status: string
+  title: string
+  type: 'start'|'io'|'next'|'exit'
+  time?: string;
+}
+
 /*** --- ***/
 
 /***  Pages Props  ***/
 export interface SkillsPropType {
   courses: SkillCourseInterface[];
-  deleteUserCourse: (courseId: number) => Promise<number>
+  deleteUserCourse: (courseId: number) => Promise<number>;
+  nodesData: ParagraphInterface[];
+  handleCourseChange: (courseId: string) => void;
 }
 
 export interface LibraryPropType {
@@ -97,39 +120,67 @@ export interface LibraryPropType {
 
 export interface SkillboxPropType {
   courses: SkillboxCourseInterface[];
-  addUserCourse: (courseId: number) => Promise<number>
-  deleteUserCourse: (courseId: number) => Promise<number>
+  addUserCourse: (courseId: number) => Promise<number>;
+  deleteUserCourse: (courseId: number) => Promise<number>;
 }
 
 export interface LoginPropType {
-  loginUser: (email: string, password: string) => Promise<ResponseInterface<UserInfoInterface>>
+  loginUser: (
+    email: string,
+    password: string
+  ) => Promise<ResponseInterface<UserInfoInterface>>;
 }
 
 export interface BookingCardPropType {
-  bookCourse: (courseId:number) => Promise<ResponseInterface<null>>
+  bookCourse: (courseId: number) => Promise<ResponseInterface<null>>;
 }
 
 export interface DrawerPropType {
-  thumbnail: string
-  title: string
-  thumbnailDark?: string
-  component?: ReactNode
-  id?:number
+  thumbnail: string;
+  title: string;
+  thumbnailDark?: string;
+  component?: ReactNode;
+  id?: number;
 }
 
-export interface PersonalTabPropType{
-  userData: UserInterface
-  updateUserData: (userData: UserInterface) => Promise<ResponseInterface<null>>
-  uploadImage: (image:File) => Promise<ResponseInterface<string>>
-} 
+export interface PersonalTabPropType {
+  userData: UserInterface;
+  updateUserData: (userData: UserInterface) => Promise<ResponseInterface<null>>;
+  uploadImage: (image: File) => Promise<ResponseInterface<string>>;
+}
 
-export interface NotificationsTabPropType{
-  notificationSettings: NotficationSettingInterface
-  updateNotificationSettings: (data: NotficationSettingInterface) => Promise<ResponseInterface<null>>
-} 
+export interface NotificationsTabPropType {
+  notificationSettings: NotficationSettingInterface;
+  updateNotificationSettings: (
+    data: NotficationSettingInterface
+  ) => Promise<ResponseInterface<null>>;
+}
 
-export interface SecurityTabPropType{
-  updatePassword: (data: ChangePasswordInterface) => Promise<ResponseInterface<null>>
-  deleteAccount: () => Promise<ResponseInterface<null>>
-} 
+export interface SecurityTabPropType {
+  updatePassword: (
+    data: ChangePasswordInterface
+  ) => Promise<ResponseInterface<null>>;
+  deleteAccount: () => Promise<ResponseInterface<null>>;
+}
+
+export interface FeedbackTabPropType {
+  feedbackData: FeedbackInterface[];
+  addFeedback: (content: string) => Promise<ResponseInterface<null>>;
+}
+
+export interface ChatComponentPropType {
+  messagesData: FeedbackInterface[] | ParagraphInterface[];
+  sendMessage?: (content: string) => void;
+  handleNext?: () => void;
+  isLoading?: boolean;
+  isBookmarked?: boolean;
+  bookmarkChapter?: () => void;
+  date?: Date;
+  chapter?: { title: string; num: number };
+  typingNotAllowed?: boolean;
+  isInModal?: boolean;
+  isHome?: boolean;
+  reportAllowed?: boolean;
+  sendDisabled?: boolean;
+}
 /*** --- ***/

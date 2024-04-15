@@ -10,7 +10,7 @@ import ImageComponent from 'ui/components/shared/ImageComponent'
 import MoreIcon from 'assets/icons/More-Vertical.png'
 import MoreIconDark from 'assets/icons/More-Vertical-dark.png'
 import DeleteIcon from 'assets/icons/trash_white.png'
-import ChatComponentMobile from '../home/ChatComponentMobile'
+import ChatComponentMobile from '../../chat/ChatComponentMobile'
 
 const SkillsBox = styled(Box)(({ theme }) => ({
     display: 'flex',

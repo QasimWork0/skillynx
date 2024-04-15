@@ -3,11 +3,11 @@ import { Box, styled } from "@mui/material";
 import { BackgroundContext } from "data/index";
 import BackgroundImage2 from "assets/images/Background_Chat.png";
 import BackgroundImage1 from "assets/images/Background.png";
-import ChatComponent from "../../home/ChatComponent";
+import ChatComponent from "../../../chat/ChatComponent";
 import CustomModal from "ui/components/shared/CustomModal";
 import useScreenSize from "hooks/ScreenSize";
 import { MobileWidth } from "entities/constants";
-import ChatComponentMobile from "ui/components/mobile/home/ChatComponentMobile";
+import ChatComponentMobile from "ui/components/chat/ChatComponentMobile";
 
 const ContentBox = styled(Box)<{ backgroundimagenumber: string }>(({ theme, backgroundimagenumber }) => ({
   backgroundImage: backgroundimagenumber === '1' ? `url(${BackgroundImage1})` : backgroundimagenumber === '2' ? `url(${BackgroundImage2})` : 'none',
@@ -46,7 +46,7 @@ const SkillModal = ({ closeModal }: any) => {
     <CustomModal closeModal={closeModal} width={width > MobileWidth ? '85.5rem' : '23.75rem'} height='45.25rem' title='Chat History'>
       <ContentBox backgroundimagenumber={backgroundImage.toString()}>
         {width > MobileWidth ?
-          <ChatComponent typingNotAllowed isInModal />
+          <ChatComponent messagesData={[]} typingNotAllowed isInModal />
           :
           <ChatComponentMobile typingNotAllowed/>
         }

@@ -12,7 +12,7 @@ const StyledButton = styled(Button)(({ theme }) => ({
 }));
 
 
-export const SubmitButton = ({ color, onClick, children, disabled=false, variant = "contained", fontColor = '', width = '11rem', marginTop = '1.6rem', height = 'auto' }: any) => {
+export const SubmitButton = ({ color, onClick, children, disabled=false, variant = "contained", fontColor = '', width = '11rem', marginTop = '1.6rem', height = 'auto', margin='' }: any) => {
   const { state: textSize } = useContext(TextSizeContext)
   const { t } = useTranslation();
 
@@ -23,6 +23,7 @@ export const SubmitButton = ({ color, onClick, children, disabled=false, variant
         color: fontColor && fontColor,
         width: width,
         height: height,
+        margin: margin,
         marginTop: marginTop,
       }}>
       {t(children)}

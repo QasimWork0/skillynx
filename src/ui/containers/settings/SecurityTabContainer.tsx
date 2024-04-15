@@ -3,17 +3,17 @@ import { SecurityTabPropType, ChangePasswordInterface } from 'entities/interface
 import useAlert from 'hooks/AlertHook';
 import React, { useEffect, useState } from 'react'
 
-const WithSecurityTabData = (NotificationsTab: React.FC<SecurityTabPropType>) => function WithProps() {
+const WithSecurityTabData = (SecurityTab: React.FC<SecurityTabPropType>) => function WithProps() {
     const {setAlert} = useAlert()
     const token = window.localStorage.getItem("currentUserToken")
     const [userEmail, setUserEmail] = useState('')
 
     useEffect(() => {
-        getNotificationSettings()
+        getEmail()
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    const getNotificationSettings = async () => {
+    const getEmail = async () => {
         const body = new URLSearchParams();
         if (token)
             body.append('userToken', token);
@@ -42,14 +42,14 @@ const WithSecurityTabData = (NotificationsTab: React.FC<SecurityTabPropType>) =>
 
     const deleteAccount = async () => {
         const body = new URLSearchParams();
-        if (token)
-            body.append('userToken', token);
-        const response = await POST('');
+        body.append('userToken', token || '');
+
+        const response = await POST('deleteUser', body);
         return response
     }
 
     return (
-        <NotificationsTab updatePassword={updatePassword} deleteAccount={deleteAccount}/>
+        <SecurityTab updatePassword={updatePassword} deleteAccount={deleteAccount}/>
     )
 }
 
