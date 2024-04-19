@@ -55,7 +55,7 @@ const MicroLearningCard = ({ num, data }: any) => {
       <MainGrid container>
         <GridItem item lg={6} md={6}>
           <Box sx={{ width: '1.5rem', height: '1.5rem' }}>
-            {data.isImportant && <ImageComponent src={BookmarkIcon} alt="bookmark" width="1.5rem" height="1.5rem" />}
+            {data.bookmark==='1' && <ImageComponent src={BookmarkIcon} alt="bookmark" width="1.5rem" height="1.5rem" />}
           </Box>
           <Title color={data.isExpandable && "primary"} fontSize={TextSizes[textSize].callout}>{t('Microlearning')} {num}</Title>
         </GridItem>

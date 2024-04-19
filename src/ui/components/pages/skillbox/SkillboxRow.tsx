@@ -89,8 +89,8 @@ const SkillboxRow = ({ skill, addUserCourse, deleteUserCourse, expanded, handleE
           <Label fontSize={TextSizes[textSize].title3}>{skill.title}</Label>
         </GridItem>
         <GridItem item lg={6} md={5} sx={{ gap: '0.75rem' }}>
-          <BorderLinearProgress variant="determinate" value={40} />
-          <Progress fontSize={TextSizes[textSize].callout}>{40}%</Progress>
+          <BorderLinearProgress variant="determinate" value={skill.progress} />
+          <Progress fontSize={TextSizes[textSize].callout}>{skill.progress.toFixed(0)}%</Progress>
         </GridItem>
         <GridItem item lg={1} md={2} sx={{ justifyContent: 'flex-end' }}>
           <IconButton onClick={() => addUserCourse(skill.id)} disabled={skill.state === 1}>

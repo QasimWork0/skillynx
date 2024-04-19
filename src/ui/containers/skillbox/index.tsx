@@ -4,7 +4,7 @@ import useAlert from 'hooks/AlertHook';
 import React, { useEffect, useState } from 'react'
 
 const WithSkillboxData = (SkillboxPage: React.FC<SkillboxPropType>) => function WithProps() {
-    const {setAlert} = useAlert()
+    const { setAlert } = useAlert()
     const token = window.localStorage.getItem("currentUserToken")
     const [courses, setCourses] = useState<SkillboxCourseInterface[]>([]);
 
@@ -21,28 +21,39 @@ const WithSkillboxData = (SkillboxPage: React.FC<SkillboxPropType>) => function 
 
         const result: SkillboxCourseInterface[] = response.result as SkillboxCourseInterface[];
 
-        // Array to store promises for each getChapters request
-        const chapterPromises = result.map(async (course) => {
+        const progressResult = await Promise.all(result.map(async (course) => {
             const body = new URLSearchParams();
+            body.append('userToken', token || '');
             body.append('option', course.id.toString());
-
-            const chaptersResponse = await POST('getChapters', body);
-            let chapters = chaptersResponse.result;
-
+            const { result:chapters } = await POST('getChapters', body) || {result:[]};
             chapters.sort((a: any, b: any) => parseInt(a.ordering) - parseInt(b.ordering))
-            return chapters
-        });
 
-        // Wait for all promises to resolve
-        const chaptersResults = await Promise.all(chapterPromises);
+            const chapterWiseProgress = await Promise.all(
+                chapters.map(async (chapter: any) => {
+                    const progressBody = new URLSearchParams();
+                    progressBody.append('userToken', token || '');
+                    progressBody.append('option', chapter.id.toString());
+                    progressBody.append('content', '2');
+                    const { result: progress } = await POST('getUserProgress', progressBody);
+    
+                    return parseInt(progress)
+                })
+            );
 
-        // Assign chaptersResults to corresponding courses
+            var progress = 0
+            chapterWiseProgress.forEach(chapterProgress => {
+                if(chapterProgress === 2){
+                    progress++
+                }
+            });
+
+            return {chapters:chapters, progress:progress * 100 /chapters.length}
+        }));
+
         result.forEach((course, index) => {
-            course.chapters = chaptersResults[index];
-            course.state = parseInt(course.state.toString())
+            course.progress = progressResult[index].progress
+            course.chapters = progressResult[index].chapters
         });
-
-        result.sort((a: any, b: any) => parseInt(a.ordering) - parseInt(b.ordering))
         setCourses(result)
     }
 
@@ -58,32 +69,30 @@ const WithSkillboxData = (SkillboxPage: React.FC<SkillboxPropType>) => function 
 
     const addUserCourse = async (courseId: number) => {
         const response = await setUserCourseState(courseId, 1);
-        if (response.status === 200)
-        {
-            setAlert({color:'success', message:'Course added back to skills!'})
+        if (response.status === 200) {
+            setAlert({ color: 'success', message: 'Course added back to skills!' })
             getCourses()
         }
         else
-            setAlert({color:'error', message:response.error})
+            setAlert({ color: 'error', message: response.error })
 
         return response.status
     }
 
     const deleteUserCourse = async (courseId: number) => {
         const response = await setUserCourseState(courseId, -1);
-        if (response.status === 200)
-        {
-            setAlert({color:'success', message:'Course removed!'})
+        if (response.status === 200) {
+            setAlert({ color: 'success', message: 'Course removed!' })
             getCourses()
         }
         else
-            setAlert({color:'error', message:response.error})
+            setAlert({ color: 'error', message: response.error })
 
         return response.status
     }
 
     return (
-        <SkillboxPage courses={courses} addUserCourse={addUserCourse} deleteUserCourse={deleteUserCourse}/>
+        <SkillboxPage courses={courses} addUserCourse={addUserCourse} deleteUserCourse={deleteUserCourse} />
     )
 }
 

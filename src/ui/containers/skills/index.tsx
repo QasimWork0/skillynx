@@ -1,5 +1,5 @@
 import { POST } from 'api/index';
-import { SkillsPropType, LibraryCourseInterface, SkillCourseInterface, ParagraphInterface } from 'entities/interfaces'
+import { SkillsPropType, SkillCourseInterface } from 'entities/interfaces'
 import useAlert from 'hooks/AlertHook';
 import React, { useEffect, useState } from 'react'
 
@@ -7,7 +7,6 @@ const WithSkillsData = (SkillsPage: React.FC<SkillsPropType>) => function WithPr
     const { setAlert } = useAlert()
     const token = window.localStorage.getItem("currentUserToken")
     const [courses, setCourses] = useState<SkillCourseInterface[]>([]);
-    const [nodesData, setNodesData] = useState<ParagraphInterface[]>([]);
 
     useEffect(() => {
         getCourses()
@@ -21,10 +20,42 @@ const WithSkillsData = (SkillsPage: React.FC<SkillsPropType>) => function WithPr
         body.append('option', '1');
         const response = await POST('getCourses', body);
 
-        const result: LibraryCourseInterface[] = response.result;
+        const result: SkillCourseInterface[] = response.result;
         result.sort((a: any, b: any) => parseInt(a.ordering) - parseInt(b.ordering))
 
-        setCourses(result as SkillCourseInterface[])
+        const progressResult = await Promise.all(result.map(async (course) => {
+            const body = new URLSearchParams();
+            body.append('userToken', token || '');
+            body.append('option', course.id.toString());
+            const { result:chapters } = await POST('getChapters', body) || {result:[]};
+
+            const chapterWiseProgress = await Promise.all(
+                chapters.map(async (chapter: any) => {
+                    const progressBody = new URLSearchParams();
+                    progressBody.append('userToken', token || '');
+                    progressBody.append('option', chapter.id.toString());
+                    progressBody.append('content', '2');
+                    const { result: progress } = await POST('getUserProgress', progressBody);
+    
+                    return parseInt(progress)
+                })
+            );
+
+            var progress = 0
+            chapterWiseProgress.forEach(chapterProgress => {
+                if(chapterProgress === 2){
+                    progress++
+                }
+            });
+
+            return progress * 100 /chapters.length
+        }));
+
+        result.forEach((course, index) => {
+            course.progress = progressResult[index];
+        });
+
+        setCourses(result)
     }
 
     const deleteUserCourse = async (courseId: number) => {
@@ -43,60 +74,12 @@ const WithSkillsData = (SkillsPage: React.FC<SkillsPropType>) => function WithPr
         return response.status
     }
 
-    const handleCourseChange = async (course_id: string) => {
-        const body = new URLSearchParams();
-        if (token)
-            body.append('userToken', token);
-        body.append('option', course_id);
-        const chaptersResp = await POST('getChapters', body);
-        const chapters = chaptersResp.result
-
-        // Array to store promises for each getSections request
-        const chapterPromises = chapters.map(async (chapter: any) => {
-            const body = new URLSearchParams();
-            body.append('option', chapter.id.toString());
-
-            const sectionsResp = await POST('getSections', body);
-            let sections = sectionsResp.result;
-
-            // Array to store promises for each getParagraphs request
-            const sectionsPromises = sections.map(async (section: any) => {
-                const body = new URLSearchParams();
-                body.append('option', section.id.toString());
-
-                const paragraphsResp = await POST('getParagraphs', body);
-                let paragraphs = paragraphsResp.result;
-
-                return paragraphs
-            });
-
-            const paragraphResult = await Promise.all(sectionsPromises);
-
-            // Assign chaptersResults to corresponding courses
-            sections.forEach((section: any, index: number) => {
-                section.paragraphs = paragraphResult[index];
-            });
-
-            // sections.sort((a:any, b:any) => parseInt(a.ordering) - parseInt(b.ordering))
-            // return sections.map((item:any) => item.title)
-            return sections
-        });
-
-        // Wait for all promises to resolve
-        const sectionsResult = await Promise.all(chapterPromises);
-
-        // Assign chaptersResults to corresponding courses
-        chapters.forEach((chapter: any, index: number) => {
-            chapter.sections = sectionsResult[index];
-        });
-
-        // setCourses(result)
-
-        setNodesData(sectionsResult[0][0].paragraphs)
+    const updateProgress = () => {
+        getCourses()
     }
 
     return (
-        <SkillsPage courses={courses} deleteUserCourse={deleteUserCourse} nodesData={nodesData} handleCourseChange={handleCourseChange} />
+        <SkillsPage courses={courses} deleteUserCourse={deleteUserCourse} updateProgress={updateProgress}/>
     )
 }
 

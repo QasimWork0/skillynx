@@ -36,3 +36,15 @@
     transform: rotate(360deg);
   }
 }
+
+.btn {
+  background-color: red;
+}
+
+.btn-primary {
+  background-color: red;
+}
+
+input  {
+  background: red;
+}

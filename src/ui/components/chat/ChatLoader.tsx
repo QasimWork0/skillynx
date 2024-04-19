@@ -22,7 +22,8 @@ const Dot = styled(Box)<{selected?:string}>(({ theme, selected }) => ({
     height: '0.5rem',
     flexShrink: 0,
     borderRadius: '50%',
-    opacity: selected? 1:0.6
+    opacity: selected? 1:0.6,
+    transition: 'opacity 0.3s ease-in-out'
 }))
 
 const ChatLoader = () => {
@@ -31,7 +32,7 @@ const ChatLoader = () => {
     useEffect(() => {
         const intervalId = setInterval(() => {
             setSelectedDot((prevDot) => (prevDot === 3 ? 1 : prevDot + 1))
-        }, 400);
+        }, 300);
 
         return () => {
             clearInterval(intervalId);

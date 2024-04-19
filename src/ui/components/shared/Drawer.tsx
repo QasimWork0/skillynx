@@ -80,11 +80,11 @@ const Drawer = ({ active, setActive, options, title, menu = [], isSettings = fal
                         <ListElement key={option.title} active={option.title === active.title ? 'true' : undefined}>
                             {option.title === active.title ?
                                 <ListBox onClick={() => setActive(option)} >
-                                    <DrawerCard courseId={option.id} label={option.title} image={option.thumbnail} imageDark={option.thumbnailDark} progress={25} active={option.title === active.title} menu={menu} isSettings={isSettings} />
+                                    <DrawerCard courseId={option.id} label={option.title} image={option.thumbnail} imageDark={option.thumbnailDark} progress={option.progress} active={option.title === active.title} menu={menu} isSettings={isSettings} />
                                 </ListBox>
                                 :
                                 <ListButton onClick={() => setActive(option)} >
-                                    <DrawerCard courseId={option.id} label={option.title} image={option.thumbnail} imageDark={option.thumbnailDark} progress={25} active={option.title === active.title} menu={menu} isSettings={isSettings} />
+                                    <DrawerCard courseId={option.id} label={option.title} image={option.thumbnail} imageDark={option.thumbnailDark} progress={option.progress} active={option.title === active.title} menu={menu} isSettings={isSettings} />
                                 </ListButton>
                             }
                         </ListElement>

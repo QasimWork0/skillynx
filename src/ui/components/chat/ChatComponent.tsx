@@ -1,4 +1,4 @@
-import React, { ChangeEvent, FormEvent, useState } from 'react'
+import React, { ChangeEvent, FormEvent, useLayoutEffect, useRef, useState } from 'react'
 import { Box, Button, IconButton, TextField, Typography, buttonClasses, styled, useTheme } from '@mui/material'
 import ImageComponent from 'ui/components/shared/ImageComponent'
 import SendIcon from 'assets/icons/send-Filled_1_.png'
@@ -14,6 +14,7 @@ import ChatLoader from './ChatLoader'
 import BookmarkIcon from 'assets/icons/bookmark.png'
 import BookmarkDarkIcon from 'assets/icons/bookmark-dark.png'
 import BookmarkFilledIcon from 'assets/icons/bookmark-filled.png'
+import { Loop } from '@mui/icons-material'
 
 
 const Wrapper = styled(Box)(() => ({
@@ -22,9 +23,8 @@ const Wrapper = styled(Box)(() => ({
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'space-between',
-    padding: "0.75rem 1.12rem",
     flexShrink: 0,
-    gap: '0.5rem'
+    // gap: '0.5rem'
 }))
 
 const TypeBox = styled('form')(({ theme }) => ({
@@ -36,7 +36,7 @@ const TypeBox = styled('form')(({ theme }) => ({
     borderRadius: '624.9375rem',
     gap: '2rem',
     flexShrink: 0,
-    margin: '2.62rem 5rem 1rem 5rem',
+    margin: '0.5rem 5rem 1rem 5rem',
 }))
 
 const TitleBox = styled(Box)(({ theme }) => ({
@@ -74,7 +74,7 @@ const FeedbackBox = styled(Box)(({ theme }) => ({
     alignSelf: 'center',
     gap: '1.2rem',
     alignItems: 'center',
-    padding: '2rem'
+    paddingTop: '1rem'
 }))
 
 const FeedbackText = styled(Typography)(({ theme }) => ({
@@ -120,16 +120,47 @@ const ChatBox = styled(Box)(({ theme }) => ({
     flexGrow: 1,
 }))
 
+const ContentBox = styled(Box)(({ theme }) => ({
+    display: 'flex',
+    flexDirection: 'column',
+    flexGrow: 1,
+    overflowY: 'scroll',
+    padding: "0.75rem 1.12rem",
+
+    "&::-webkit-scrollbar": {
+        width: "0.4rem",
+        height: '0.4rem',
+    },
+    "&::-webkit-scrollbar-track": {
+        background: theme.palette.secondary.main,
+    },
+    "&::-webkit-scrollbar-thumb": {
+        background: theme.palette.primary.dark,
+        borderRadius: "10px",
+    },
+    "&::-webkit-scrollbar-thumb:hover": {
+        background: theme.palette.grey[700],
+    },
+    marginRight: '0.1rem',
+}))
+
 const ChatComponent = (
     {
-        messagesData, sendMessage, date, chapter, isInModal, typingNotAllowed, isHome,
-        isBookmarked, bookmarkChapter, reportAllowed, sendDisabled, isLoading, handleNext
+        messagesData, sendMessage, date, chapter, isInModal, typingNotAllowed, isHome, handleFeedback, 
+        bookmarkChapter, reportAllowed, sendDisabled, isLoading, handleNext, resetSection,
     }: ChatComponentPropType) => {
     const fontSize = useFontSize()
     const theme = useTheme()
     const { t } = useTranslation()
     const [reportModal, setReportModal] = useState(false);
     const [messageText, setMessageText] = useState('');
+    const containerRef = useRef<HTMLDivElement>(null);
+
+    useLayoutEffect(() => {
+        if (containerRef.current) {
+            containerRef.current.scrollTop = containerRef.current.scrollHeight;
+        }
+    }, [messagesData, isLoading]);
 
     const handleReport = () => {
         setReportModal(!reportModal)
@@ -163,46 +194,61 @@ const ChatComponent = (
 
     return (
         <Wrapper >
-            {date &&
-                <TitleBox>
-                    <Typography fontWeight={400} fontSize={fontSize.body}>{formatDate(date)}</Typography>
-                </TitleBox>
-            }
-            {chapter &&
-                <TitleBox sx={{ backgroundColor: theme.palette.primary.main, color: theme.palette.common.white }}>
-                    <TitleNum fontSize={fontSize.body}>{chapter.num}</TitleNum>
-                    <TitleText fontSize={fontSize.body}>{t(chapter.title)}</TitleText>
-                    <IconButton onClick={bookmarkChapter}>
-                        <ImageComponent
-                            src={isBookmarked ? BookmarkFilledIcon : theme.palette.mode === 'light' ? BookmarkIcon : BookmarkDarkIcon}
-                            alt='bookmark' width='' />
-                    </IconButton>
-                </TitleBox>
-            }
-            <ChatBox padding={isHome ? '1.25rem 6rem' : '1.25rem 0'}>
-                {
-                    messagesData.map((message, key) => (
-                        <ChatBubble key={key} message={isFeedbackInterface(message) ? message.feedback : message.content} date={message.time} isLeft={isFeedbackInterface(message) ? message.direction==='0' : true}
-                            handleReport={reportAllowed && handleReport} />
-                    ))
+            <ContentBox ref={containerRef}>
+                {date &&
+                    <>
+                        <TitleBox>
+                            <Typography fontWeight={400} fontSize={fontSize.body} flexGrow={1}>{formatDate(date)}</Typography>
+                            {resetSection && <SubmitButton variant='outlined' fontColor={theme.palette.text.primary}
+                                marginTop='0' width="10rem" icon={<Loop fontSize='small' />} onClick={resetSection}>
+                                Start Over</SubmitButton>}
+                        </TitleBox>
+                        <TitleBox sx={{ backgroundColor: theme.palette.primary.main, color: theme.palette.common.white }}>
+                            {chapter &&
+                                <>
+                                    <TitleNum fontSize={fontSize.body}>{chapter.num}</TitleNum>
+                                    <TitleText fontSize={fontSize.body}>{t(chapter.title)}</TitleText>
+                                    <IconButton onClick={() => bookmarkChapter && bookmarkChapter(chapter.id, chapter.isBookmarked ? 0 : 1)}>
+                                        <ImageComponent
+                                            src={chapter.isBookmarked ? BookmarkFilledIcon : theme.palette.mode === 'light' ? BookmarkIcon : BookmarkDarkIcon}
+                                            alt='bookmark' width='1.5rem' height='1.5rem' />
+                                    </IconButton>
+                                </>
+                            }
+
+                        </TitleBox>
+                    </>
                 }
-                {isLoading && <ChatLoader />}
-                {handleNext && <SubmitButton width='7.25rem' height='2.5rem' margin='0rem 3.8rem' marginTop='1rem' onClick={handleNext}>Next</SubmitButton>}
-            </ChatBox>
-            {false &&
-                <FeedbackBox>
-                    <FeedbackText fontSize={fontSize.title3}>{t('How did you like this Microlearning?')}</FeedbackText>
-                    <FeedbackButtonBox>
-                        <FeedbackButton variant='contained' color='success'>
-                            <ImageComponent src={ThumbUpIcon} alt='send' width='2rem' height='2rem' filterAllowed />
-                        </FeedbackButton>
-                        <FeedbackButton variant='contained' color='error'>
-                            <ImageComponent src={ThumbDownIcon} alt='send' width='2rem' height='2rem' filterAllowed />
-                        </FeedbackButton>
-                        <FeedbackButton variant='contained' color='secondary' sx={{ fontSize: fontSize.body }}>{t('Skip')}</FeedbackButton>
-                    </FeedbackButtonBox>
-                </FeedbackBox>
-            }
+
+                <ChatBox padding={isHome ? '1.25rem 6rem ' : '1.25rem 0 0 0'}>
+                    {
+                        messagesData.map((message, index) => (
+                            isFeedbackInterface(message) || message.type === 'io' ?
+                                <ChatBubble key={index} message={isFeedbackInterface(message) ? message.feedback : message.content} date={message.time} isLeft={isFeedbackInterface(message) ? message.direction === '0' : true}
+                                    handleReport={reportAllowed && handleReport} handleNext={handleNext} outputs={!isFeedbackInterface(message) && message.outputs} disabled='false' />
+                                : message.type === 'next' ?
+                                    <SubmitButton width='7.25rem' height='2.5rem' margin='0.5rem 3.8rem' marginTop='0.5rem' disabled={index < messagesData.length - 1 || isLoading}
+                                        onClick={() => handleNext && handleNext(message.outputs)}>Next</SubmitButton>
+                                    : message.type === 'exit' && handleFeedback &&
+                                        <FeedbackBox>
+                                            <FeedbackText fontSize={fontSize.title3}>
+                                                {t('How did you like this Microlearning?')}</FeedbackText>
+                                            <FeedbackButtonBox>
+                                                <FeedbackButton variant='contained' color='success' onClick={() => handleFeedback && handleFeedback()} disabled={isLoading}>
+                                                    <ImageComponent src={ThumbUpIcon} alt='send' width='2rem' height='2rem' filterAllowed />
+                                                </FeedbackButton>
+                                                <FeedbackButton variant='contained' color='error' onClick={() => handleFeedback && handleFeedback()} disabled={isLoading}>
+                                                    <ImageComponent src={ThumbDownIcon} alt='send' width='2rem' height='2rem' filterAllowed />
+                                                </FeedbackButton>
+                                                <FeedbackButton variant='contained' color='secondary' onClick={() => handleFeedback && handleFeedback()} disabled={isLoading}
+                                                    sx={{ fontSize: fontSize.body }}>{t('Skip')}</FeedbackButton>
+                                            </FeedbackButtonBox>
+                                        </FeedbackBox>
+                        ))
+                    }
+                    {isLoading && <ChatLoader />}
+                </ChatBox>
+            </ContentBox>
             {!typingNotAllowed && (
                 <TypeBox onSubmit={handleSubmit}>
                     <TextField placeholder={`${t('Type a message')}...`} fullWidth autoComplete='off' value={messageText} onChange={handleChange}

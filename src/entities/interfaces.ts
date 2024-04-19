@@ -42,6 +42,7 @@ export interface SkillCourseInterface {
   ordering: number;
   status: number;
   state: number;
+  progress: number
 }
 
 export interface ChapterInterface {
@@ -110,8 +111,7 @@ export interface ParagraphInterface {
 export interface SkillsPropType {
   courses: SkillCourseInterface[];
   deleteUserCourse: (courseId: number) => Promise<number>;
-  nodesData: ParagraphInterface[];
-  handleCourseChange: (courseId: string) => void;
+  updateProgress: ()=>void
 }
 
 export interface LibraryPropType {
@@ -171,16 +171,19 @@ export interface FeedbackTabPropType {
 export interface ChatComponentPropType {
   messagesData: FeedbackInterface[] | ParagraphInterface[];
   sendMessage?: (content: string) => void;
-  handleNext?: () => void;
+  handleNext?: (outputs: string) => void;
   isLoading?: boolean;
-  isBookmarked?: boolean;
-  bookmarkChapter?: () => void;
+  bookmarkChapter?: (id:string, value:number) => void;
   date?: Date;
-  chapter?: { title: string; num: number };
+  chapter?: { id:string, title: string; num: number, isBookmarked:boolean };
   typingNotAllowed?: boolean;
   isInModal?: boolean;
   isHome?: boolean;
   reportAllowed?: boolean;
   sendDisabled?: boolean;
+  resetSection?: (sectionId: string) => void,
+  handleFeedback?: ()=>void
+  nextSection?: ()=>void
+  isLastSection?: boolean
 }
 /*** --- ***/

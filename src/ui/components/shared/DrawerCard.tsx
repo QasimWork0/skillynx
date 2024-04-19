@@ -54,7 +54,7 @@ const OptionsArrowBox = styled(Box)(({ theme }) => ({
 
 const SkillName = styled(Typography)(({ theme }) => ({
     width: '8rem',
-    maxHeight: '3.2rem',
+    maxHeight: '3.8rem',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
     // whiteSpace: 'nowrap',  
@@ -98,7 +98,7 @@ const DrawerCard = ({ label, image, imageDark, courseId, menu = [], active = fal
                 >
                     <ImageComponent src={image} alt='skill' width='3.25rem' height='3.25rem' borderRadius='50%' />
                     <RadialSeparators
-                        count={8}
+                        count={Math.trunc(progress>0 ? 8: 0)}
                         style={{
                             background: theme.palette.common.white,
                             width: "4px",
@@ -118,14 +118,14 @@ const DrawerCard = ({ label, image, imageDark, courseId, menu = [], active = fal
             <OptionsPopup id={id} open={open} anchor={anchor}>
                 <OptionsBox>
                     {menu.map((item: any, index: number) => (
-                        <>
-                            <Option key={index} sx={{ fontSize: TextSizes[textSize].subhead, color: item.color }}
+                        <Box key={index}>
+                            <Option  sx={{ fontSize: TextSizes[textSize].subhead, color: item.color }}
                                 onClick={() => item.clickHandler(courseId)}>
                                 <ImageComponent src={item.icon} alt='icon' width='1.25rem' height='1.25rem' />
                                 {item.title}
                             </Option>
                             {index !== menu.length - 1 && <Divider />}
-                        </>
+                        </Box>
                     ))}
                     <OptionsArrowBox />
                 </OptionsBox>

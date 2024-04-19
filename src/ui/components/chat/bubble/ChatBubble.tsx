@@ -1,7 +1,8 @@
 import React, { useRef, useState } from 'react'
-import { Box, Button, IconButton, Typography,  styled, useTheme } from '@mui/material'
+import { Box, Button, IconButton, Typography, styled, useTheme } from '@mui/material'
 import useFontSize from 'hooks/FontSize';
 import { Report } from '@mui/icons-material';
+import "./../../../../assets/styles/chatInteractiveElements.css"
 
 const Wrapper = styled(Box)<{ isleft?: string }>(({ isleft }) => ({
   width: '100%',
@@ -14,7 +15,7 @@ const MessageBox = styled(Box)(({ theme }) => ({
   alignItems: 'flex-end',
   gap: '0.75rem',
   maxWidth: '70%',
-  flexShrink:0,
+  flexShrink: 0,
 }))
 
 const MessageTailBox = styled(Button)(({ theme }) => ({
@@ -26,7 +27,7 @@ const MessageTailBox = styled(Button)(({ theme }) => ({
   justifyContent: 'flex-end',
   boxShadow: '0px 4px 7px 0px rgba(193, 193, 193, 0.25)',
   padding: 0,
-  flexGrow:1,
+  flexGrow: 1,
 }))
 
 const UserIcon = styled(Typography)(({ theme }) => ({
@@ -38,35 +39,43 @@ const UserIcon = styled(Typography)(({ theme }) => ({
   borderRadius: '50%',
   color: theme.palette.common.white,
   fontSize: '1.5rem',
-  flexShrink:0
+  flexShrink: 0
 }))
 
 const BubbleBox = styled(Box)(({ theme }) => ({
   borderRadius: '0.75rem',
   zIndex: 3,
-  display:'flex',
-  justifyContent:'flex-end',
-  alignItems:'flex-end',
-  flexGrow:1,
-  width:'100%'
+  display: 'flex',
+  justifyContent: 'flex-end',
+  alignItems: 'flex-end',
+  flexGrow: 1,
+  width: '100%'
 }))
 
 const DateText = styled(Typography)(({ theme }) => ({
-  position:'absolute',
-  padding:'0.5rem',
+  position: 'absolute',
+  padding: '0.5rem',
   userSelect: 'text'
 }))
 
 const Message = styled(Typography)(({ theme }) => ({
   width: '100%',
-  padding:'1.5rem 3.25rem 1.5rem 1.5rem',
-  textAlign:'left',
-  userSelect:'text'
+  padding: '1.5rem 3.25rem 1.5rem 1.5rem',
+  textAlign: 'left',
+  userSelect: 'text',
+  'input': {
+    cursor: 'pointer',
+  },
+  ':disabled': {
+    'input': {
+      cursor: 'no-drop',
+    }
+  }
 }))
 
 const ReportButton = styled(IconButton)(({ theme }) => ({
   position: "absolute",
-  alignSelf:'flex-start',
+  alignSelf: 'flex-start',
   margin: '-0.rem',
 }));
 
@@ -75,7 +84,7 @@ const TailIcon = ({ isLeft, color }: { isLeft: boolean, color: string }) => {
   const leftTail = (
     <svg width="20px" height="40px" style={{ marginLeft: '-0.4rem', marginBottom: '-0.2rem' }}>
       <path
-        fill={color || theme.palette.secondary.light}
+        fill={color || theme.palette.common.white}
         d="M0.136963 34.7625C6.47176 36.1403 12.7254 31.2089 14.7557 28.0515C12.663 20.9964 25.5833 3.861 17.0557 3.86034C15.0838 3.86034 13.3997 -3.44205 6.22812 2.04016C6.20228 4.25639 6.22812 11.9278 6.22812 13.234C6.22812 31.3174 -1.08127 33.7235 0.136963 34.7625Z"
       />
     </svg>
@@ -104,7 +113,7 @@ const TailIcon = ({ isLeft, color }: { isLeft: boolean, color: string }) => {
   )
 }
 
-const ChatBubble = ({ message, date, handleReport, isLeft = false }: any) => {
+const ChatBubble = ({ message, date, handleReport, isLeft = false, handleNext = (outputs: string) => { }, outputs = '' }: any, disabled = false) => {
   const [reportVisible, setReportVisible] = useState(false);
   const theme = useTheme()
   const bubbleRef = useRef(null)
@@ -114,14 +123,29 @@ const ChatBubble = ({ message, date, handleReport, isLeft = false }: any) => {
     setReportVisible(!reportVisible)
   }
 
-  function formatDate(dateString:string):string  {
+  function formatDate(dateString: string): string {
     const date = new Date(dateString)
     const hours = date.getHours() % 12 || 12; // Get 12-hour format (adjust for AM/PM)
     const minutes = date.getMinutes().toString().padStart(2, '0'); // Add leading zero for single-digit minutes
     const ampm = hours >= 12 ? 'PM' : 'AM';
-  
+
     return `${hours}:${minutes} ${ampm}`;
   }
+
+  const decodeMessage = (message: string) => {
+    const userName = localStorage.getItem('currentUserName')?.split(' ')[0] || ''
+
+    const decodedMessage = decodeURIComponent(message)
+    const finalMessage = decodedMessage.replaceAll("@user.name", userName)
+    return finalMessage
+  }
+
+  const handleButtonClickWrapper = (event: any) => {
+    const { target } = event;
+    if (target.tagName.toLowerCase() === 'input' && target.type === 'submit') {
+      handleNext(outputs.split(',')[target.id])
+    }
+  };
 
   return (
     <Wrapper isleft={isLeft ? 'true' : undefined}>
@@ -129,16 +153,16 @@ const ChatBubble = ({ message, date, handleReport, isLeft = false }: any) => {
         <UserIcon sx={{ backgroundColor: isLeft ? theme.palette.secondary.light : theme.palette.grey[200] }}>
           {!isLeft ? window.localStorage.getItem("currentUserName")?.charAt(0) : ''}
         </UserIcon>
-        <MessageTailBox sx={!handleReport? {cursor:'default'}:{}}>
+        <MessageTailBox sx={!handleReport ? { cursor: 'default' } : {}} disabled={false}>
           <TailIcon isLeft={isLeft} color={bubbleRef.current ? window.getComputedStyle(bubbleRef.current).backgroundColor : ''} />
           <BubbleBox onClick={handleClick} ref={bubbleRef}
             sx={{ backgroundColor: isLeft ? theme.palette.common.white : '#DCE2DD', }}
           >
-            <Message fontSize={fontSize.callout} dangerouslySetInnerHTML={{__html:decodeURIComponent(message)}}></Message>
-            <DateText fontSize={fontSize.caption1}>{formatDate(date)}</DateText>
+            <Message fontSize={fontSize.callout} dangerouslySetInnerHTML={{ __html: decodeMessage(message) }} onClick={handleButtonClickWrapper} />
+            {date && <DateText fontSize={fontSize.caption1}>{formatDate(date)}</DateText>}
             {handleReport && reportVisible &&
               <ReportButton onClick={handleReport}>
-                <Report/>
+                <Report />
               </ReportButton>}
           </BubbleBox>
         </MessageTailBox>
