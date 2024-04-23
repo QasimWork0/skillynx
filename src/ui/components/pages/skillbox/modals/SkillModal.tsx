@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useLayoutEffect, useState } from "react";
 import { Box, styled } from "@mui/material";
 import { BackgroundContext } from "data/index";
 import BackgroundImage2 from "assets/images/Background_Chat.png";
@@ -7,7 +7,7 @@ import ChatComponent from "../../../chat/ChatComponent";
 import CustomModal from "ui/components/shared/CustomModal";
 import useScreenSize from "hooks/ScreenSize";
 import { MobileWidth } from "entities/constants";
-import ChatComponentMobile from "ui/components/chat/ChatComponentMobile";
+import { ParagraphInterface } from "entities/interfaces";
 
 const ContentBox = styled(Box)<{ backgroundimagenumber: string }>(({ theme, backgroundimagenumber }) => ({
   backgroundImage: backgroundimagenumber === '1' ? `url(${BackgroundImage1})` : backgroundimagenumber === '2' ? `url(${BackgroundImage2})` : 'none',
@@ -19,9 +19,8 @@ const ContentBox = styled(Box)<{ backgroundimagenumber: string }>(({ theme, back
   justifyContent: 'space-between',
   alignItems: 'center',
   margin: '0 0.1rem 0.1rem 0.1rem',
-  padding: '0 1.4rem 1.4rem 1.4rem',
   borderRadius: "0 0 1rem 1rem",
-  overflowY: "scroll",
+  overflowY: "auto",
   "&::-webkit-scrollbar": {
     width: "0.4rem",
     height: '0.4rem',
@@ -38,18 +37,27 @@ const ContentBox = styled(Box)<{ backgroundimagenumber: string }>(({ theme, back
   },
 }));
 
-const SkillModal = ({ closeModal }: any) => {
+const SkillModal = ({ closeModal, getChapterHistory }: { closeModal:()=>void, getChapterHistory: () => Promise<ParagraphInterface[]>}) => {
   const { state: backgroundImage } = useContext(BackgroundContext)
   const { width } = useScreenSize()
+  const [chatHistory, setChatHistory] = useState<ParagraphInterface[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const getChatHistory = async() => {
+    const data = await getChapterHistory()
+    setChatHistory(data)
+    setIsLoading(false)
+  }
+
+  useLayoutEffect(() => {
+    getChatHistory()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
-    <CustomModal closeModal={closeModal} width={width > MobileWidth ? '85.5rem' : '23.75rem'} height='45.25rem' title='Chat History'>
+    <CustomModal closeModal={closeModal} width={width > MobileWidth ? '85.5rem' : '90%'} height='45.25rem' title='Chat History'>
       <ContentBox backgroundimagenumber={backgroundImage.toString()}>
-        {width > MobileWidth ?
-          <ChatComponent messagesData={[]} typingNotAllowed isInModal />
-          :
-          <ChatComponentMobile typingNotAllowed/>
-        }
+        <ChatComponent messagesData={chatHistory} typingNotAllowed isInModal isLoading={isLoading} isHome={width>MobileWidth}/>
       </ContentBox>
     </CustomModal>
   );

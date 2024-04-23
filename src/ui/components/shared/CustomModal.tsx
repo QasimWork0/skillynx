@@ -4,7 +4,7 @@ import CrossIcon from "assets/icons/Cancel.png";
 import ImageComponent from "ui/components/shared/ImageComponent";
 import { useTranslation } from "react-i18next";
 import { TextSizeContext } from "data/index";
-import { TextSizes } from "entities/constants";
+import {  TextSizes } from "entities/constants";
 
 const StyledModal = styled(Modal)(({ theme }) => ({
   display: "flex",
@@ -18,7 +18,8 @@ const Wrapper = styled(Box)(({ theme }) => ({
   position: "fixed",
   borderRadius: "1rem",
   display: "flex",
-  flexDirection: 'column'
+  flexDirection: 'column',
+  maxWidth:'90%',
 }));
 
 const HeaderBox = styled(Box)(({ theme }) => ({
@@ -27,6 +28,7 @@ const HeaderBox = styled(Box)(({ theme }) => ({
   height: '5rem',
   alignItems: 'center',
   padding: '0 1.5rem',
+  flexShrink: 0,
 }));
 
 const HeaderLabel = styled(Typography)(({ theme }) => ({

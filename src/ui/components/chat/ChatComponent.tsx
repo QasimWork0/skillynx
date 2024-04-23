@@ -15,6 +15,8 @@ import BookmarkIcon from 'assets/icons/bookmark.png'
 import BookmarkDarkIcon from 'assets/icons/bookmark-dark.png'
 import BookmarkFilledIcon from 'assets/icons/bookmark-filled.png'
 import { Loop } from '@mui/icons-material'
+import useScreenSize from 'hooks/ScreenSize'
+import { MobileWidth } from 'entities/constants'
 
 
 const Wrapper = styled(Box)(() => ({
@@ -28,7 +30,7 @@ const Wrapper = styled(Box)(() => ({
 }))
 
 const TypeBox = styled('form')(({ theme }) => ({
-    backgroundColor: theme.palette.common.white,
+    backgroundColor: theme.palette.mode==='light'? theme.palette.common.white:theme.palette.grey[800],
     height: '5rem',
     display: 'flex',
     alignItems: 'center',
@@ -37,6 +39,7 @@ const TypeBox = styled('form')(({ theme }) => ({
     gap: '2rem',
     flexShrink: 0,
     margin: '0.5rem 5rem 1rem 5rem',
+    boxShadow: '0px 0px 16px rgba(0, 0, 0, 0.1)',
 }))
 
 const TitleBox = styled(Box)(({ theme }) => ({
@@ -54,6 +57,11 @@ const TitleText = styled(Typography)(({ theme }) => ({
     fontWeight: 400,
     color: theme.palette.common.white,
     flexGrow: 1,
+    lineHeight:'1rem',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    maxHeight:'100%',
+    // whiteSpace: 'nowrap', 
 }))
 
 const TitleNum = styled(TitleText)(({ theme }) => ({
@@ -126,30 +134,33 @@ const ContentBox = styled(Box)(({ theme }) => ({
     flexGrow: 1,
     overflowY: 'scroll',
     padding: "0.75rem 1.12rem",
+    [theme.breakpoints.up('md')]: {
+        "&::-webkit-scrollbar": {
+            width: "0.4rem",
+            height: '0.4rem',
+        },
+        "&::-webkit-scrollbar-track": {
+            background: 'transparent',
+        },
+        "&::-webkit-scrollbar-thumb": {
+            background: theme.palette.primary.dark,
+            borderRadius: "10px",
+        },
+        "&::-webkit-scrollbar-thumb:hover": {
+            background: theme.palette.grey[700],
+        },
+        marginRight: '0.1rem',
+    },
 
-    "&::-webkit-scrollbar": {
-        width: "0.4rem",
-        height: '0.4rem',
-    },
-    "&::-webkit-scrollbar-track": {
-        background: theme.palette.secondary.main,
-    },
-    "&::-webkit-scrollbar-thumb": {
-        background: theme.palette.primary.dark,
-        borderRadius: "10px",
-    },
-    "&::-webkit-scrollbar-thumb:hover": {
-        background: theme.palette.grey[700],
-    },
-    marginRight: '0.1rem',
 }))
 
 const ChatComponent = (
     {
-        messagesData, sendMessage, date, chapter, isInModal, typingNotAllowed, isHome, handleFeedback, 
-        bookmarkChapter, reportAllowed, sendDisabled, isLoading, handleNext, resetSection,
+        messagesData, sendMessage, date, chapter, isInModal, typingNotAllowed, isHome, handleFeedback,
+        bookmarkChapter, reportAllowed, sendDisabled, isLoading, handleNext, clearProgress,
     }: ChatComponentPropType) => {
     const fontSize = useFontSize()
+    const {width} = useScreenSize()
     const theme = useTheme()
     const { t } = useTranslation()
     const [reportModal, setReportModal] = useState(false);
@@ -199,8 +210,8 @@ const ChatComponent = (
                     <>
                         <TitleBox>
                             <Typography fontWeight={400} fontSize={fontSize.body} flexGrow={1}>{formatDate(date)}</Typography>
-                            {resetSection && <SubmitButton variant='outlined' fontColor={theme.palette.text.primary}
-                                marginTop='0' width="10rem" icon={<Loop fontSize='small' />} onClick={resetSection}>
+                            {clearProgress && chapter && <SubmitButton variant='outlined' fontColor={theme.palette.text.primary}
+                                marginTop='0' width="10rem" icon={<Loop fontSize='small' />} onClick={clearProgress}>
                                 Start Over</SubmitButton>}
                         </TitleBox>
                         <TitleBox sx={{ backgroundColor: theme.palette.primary.main, color: theme.palette.common.white }}>
@@ -220,7 +231,7 @@ const ChatComponent = (
                     </>
                 }
 
-                <ChatBox padding={isHome ? '1.25rem 6rem ' : '1.25rem 0 0 0'}>
+                <ChatBox padding={isHome ? '1.25rem 3rem ' : '1.25rem 0 0 0'}>
                     {
                         messagesData.map((message, index) => (
                             isFeedbackInterface(message) || message.type === 'io' ?
@@ -230,31 +241,31 @@ const ChatComponent = (
                                     <SubmitButton width='7.25rem' height='2.5rem' margin='0.5rem 3.8rem' marginTop='0.5rem' disabled={index < messagesData.length - 1 || isLoading}
                                         onClick={() => handleNext && handleNext(message.outputs)}>Next</SubmitButton>
                                     : message.type === 'exit' && handleFeedback &&
-                                        <FeedbackBox>
-                                            <FeedbackText fontSize={fontSize.title3}>
-                                                {t('How did you like this Microlearning?')}</FeedbackText>
-                                            <FeedbackButtonBox>
-                                                <FeedbackButton variant='contained' color='success' onClick={() => handleFeedback && handleFeedback()} disabled={isLoading}>
-                                                    <ImageComponent src={ThumbUpIcon} alt='send' width='2rem' height='2rem' filterAllowed />
-                                                </FeedbackButton>
-                                                <FeedbackButton variant='contained' color='error' onClick={() => handleFeedback && handleFeedback()} disabled={isLoading}>
-                                                    <ImageComponent src={ThumbDownIcon} alt='send' width='2rem' height='2rem' filterAllowed />
-                                                </FeedbackButton>
-                                                <FeedbackButton variant='contained' color='secondary' onClick={() => handleFeedback && handleFeedback()} disabled={isLoading}
-                                                    sx={{ fontSize: fontSize.body }}>{t('Skip')}</FeedbackButton>
-                                            </FeedbackButtonBox>
-                                        </FeedbackBox>
+                                    <FeedbackBox>
+                                        <FeedbackText fontSize={fontSize.title3}>
+                                            {t('How did you like this Microlearning?')}</FeedbackText>
+                                        <FeedbackButtonBox>
+                                            <FeedbackButton variant='contained' color='success' onClick={() => handleFeedback && handleFeedback()} disabled={isLoading}>
+                                                <ImageComponent src={ThumbUpIcon} alt='send' width='2rem' height='2rem' filterAllowed />
+                                            </FeedbackButton>
+                                            <FeedbackButton variant='contained' color='error' onClick={() => handleFeedback && handleFeedback()} disabled={isLoading}>
+                                                <ImageComponent src={ThumbDownIcon} alt='send' width='2rem' height='2rem' filterAllowed />
+                                            </FeedbackButton>
+                                            <FeedbackButton variant='contained' color='secondary' onClick={() => handleFeedback && handleFeedback()} disabled={isLoading}
+                                                sx={{ fontSize: fontSize.body }}>{t('Skip')}</FeedbackButton>
+                                        </FeedbackButtonBox>
+                                    </FeedbackBox>
                         ))
                     }
-                    {isLoading && <ChatLoader />}
+                    {isLoading && <ChatLoader isInModal={isInModal}/>}
                 </ChatBox>
             </ContentBox>
             {!typingNotAllowed && (
-                <TypeBox onSubmit={handleSubmit}>
+                <TypeBox onSubmit={handleSubmit} sx={width<=MobileWidth?{margin:'0.5rem 1rem', height:'4rem'}:{}}>
                     <TextField placeholder={`${t('Type a message')}...`} fullWidth autoComplete='off' value={messageText} onChange={handleChange}
-                        variant="standard" InputProps={{ sx: { fontSize: fontSize.body, letterSpacing: '0.02rem' }, disableUnderline: true }} />
-                    <SendButton variant='contained' color='primary' disabled={sendDisabled || messageText.trim() === ''} type='submit'>
-                        <ImageComponent src={SendIcon} alt='send' width='2rem' height='2rem' />
+                        variant="standard" InputProps={{ sx: { fontSize: fontSize.body, letterSpacing: '0.02rem', color: theme.palette.mode==='light'?theme.palette.text.primary:theme.palette.grey[400] }, disableUnderline: true }} disabled={sendDisabled}/>
+                    <SendButton variant='contained' disabled={sendDisabled || messageText.trim() === ''} type='submit' sx={width<=MobileWidth?{height:'3rem', width:'3rem'}:{}}>
+                        <ImageComponent src={SendIcon} alt='send' width={width<=MobileWidth?'1.2rem':'1.5rem'} height={width<=MobileWidth?'1.2rem':'1.5rem'}/>
                     </SendButton>
                 </TypeBox>
             )}

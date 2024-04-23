@@ -2,7 +2,6 @@ import React from "react";
 import ChatComponent from "ui/components/chat/ChatComponent";
 import useScreenSize from "hooks/ScreenSize";
 import { MobileWidth } from "entities/constants";
-import ChatComponentMobile from "ui/components/chat/ChatComponentMobile";
 import Header from "ui/components/shared/Header";
 import { Box, styled } from "@mui/material";
 
@@ -36,11 +35,12 @@ const Home = () => {
           <>
             <Header />
             <Wrapper>
-              <ChatComponent messagesData={[]}/>
+              <ChatComponent messagesData={[]} />
             </Wrapper>
           </>
         ) :
-        <ChatComponentMobile />}
+        <ChatComponent messagesData={[]} />
+      }
     </>
   );
 };

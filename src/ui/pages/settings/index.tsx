@@ -29,7 +29,6 @@ const Settings = () => {
       ) : (
         <SettingsListView options={SettingsMenu} active={active} setActive={setActive} />
       )}
-
     </SettingsWrapper>
   );
 };

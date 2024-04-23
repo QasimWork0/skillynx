@@ -10,7 +10,7 @@ import ImageComponent from 'ui/components/shared/ImageComponent'
 import MoreIcon from 'assets/icons/More-Vertical.png'
 import MoreIconDark from 'assets/icons/More-Vertical-dark.png'
 import DeleteIcon from 'assets/icons/trash_white.png'
-import ChatComponentMobile from '../../chat/ChatComponentMobile'
+import SkillsChatWrapper from 'ui/containers/skills/SkillsChatWrapper'
 
 const SkillsBox = styled(Box)(({ theme }) => ({
     display: 'flex',
@@ -20,7 +20,7 @@ const SkillsBox = styled(Box)(({ theme }) => ({
 }))
 
 const ListElement = styled(ListItem)<{ more?: string }>(({ theme, more }) => ({
-    backgroundColor: more ? theme.palette.grey[800] : theme.palette.mode==='light'? theme.palette.common.white: theme.palette.grey[900],
+    backgroundColor: more ? theme.palette.grey[800] : theme.palette.mode === 'light' ? theme.palette.common.white : theme.palette.grey[900],
     height: '7.25rem',
     padding: '0 0.75rem 0 0',
     borderRadius: '0rem 0rem 1.5rem 0rem',
@@ -83,7 +83,7 @@ const StyledList = styled(List)(({ theme }) => ({
     flexGrow: 1,
 }))
 
-const SkillsListView = ({ active, setActive, options, deleteUserCourse }: any) => {
+const SkillsListView = ({ active, setActive, options, deleteUserCourse, updateProgress }: any) => {
     const theme = useTheme()
     const { t } = useTranslation()
     const { state: textSize } = useContext(TextSizeContext)
@@ -110,7 +110,7 @@ const SkillsListView = ({ active, setActive, options, deleteUserCourse }: any) =
                             <ListElementBox key={option.id}>
                                 <ListElement more={option.title === moreOptionLabel ? 'true' : undefined} sx={{ marginRight: '-1.312rem' }}>
                                     <ListButton onClick={() => setActive(option)} >
-                                        <SkillCardMobile label={option.title} image={option.thumbnail} progress={25} selected={option.title === moreOptionLabel} />
+                                        <SkillCardMobile label={option.title} image={option.thumbnail} progress={option.progress} selected={option.title === moreOptionLabel} />
                                     </ListButton>
                                     <IconButton onClick={() => handleMore(option.title)}>
                                         <ImageComponent src={theme.palette.mode === 'light' ? MoreIcon : MoreIconDark} alt='more' width='1.5rem' height='1.5rem' />
@@ -129,7 +129,14 @@ const SkillsListView = ({ active, setActive, options, deleteUserCourse }: any) =
             </StyledList>
             {active && active.title &&
                 <SubScreenMobile data={active} onClose={() => setActive({ title: "", thumbnail: "" })} >
-                    <ChatComponentMobile />
+                    <Box sx={{
+                        width: 'calc(100% + 1.75rem)',
+                        height: '100%',
+                        margin: '0 -1rem',
+                        overflowX:'clip'
+                    }}>
+                        <SkillsChatWrapper active={active} updateProgress={updateProgress} />
+                    </Box>
                 </SubScreenMobile>
             }
         </SkillsBox>

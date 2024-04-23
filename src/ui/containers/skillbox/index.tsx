@@ -1,5 +1,5 @@
 import { POST } from 'api/index';
-import { SkillboxCourseInterface, SkillboxPropType } from 'entities/interfaces'
+import { ParagraphInterface, SkillBoxChapterInterface, SkillboxCourseInterface, SkillboxPropType } from 'entities/interfaces'
 import useAlert from 'hooks/AlertHook';
 import React, { useEffect, useState } from 'react'
 
@@ -19,13 +19,14 @@ const WithSkillboxData = (SkillboxPage: React.FC<SkillboxPropType>) => function 
             body.append('userToken', token);
         const response = await POST('getCourses', body);
 
-        const result: SkillboxCourseInterface[] = response.result as SkillboxCourseInterface[];
+        const result: SkillboxCourseInterface[] = response.result as SkillboxCourseInterface[] || [];
+        result.sort((a: any, b: any) => parseInt(a.ordering) - parseInt(b.ordering))
 
         const progressResult = await Promise.all(result.map(async (course) => {
             const body = new URLSearchParams();
             body.append('userToken', token || '');
             body.append('option', course.id.toString());
-            const { result:chapters } = await POST('getChapters', body) || {result:[]};
+            const { result: chapters } = await POST('getChapters', body) || { result: [] };
             chapters.sort((a: any, b: any) => parseInt(a.ordering) - parseInt(b.ordering))
 
             const chapterWiseProgress = await Promise.all(
@@ -35,19 +36,20 @@ const WithSkillboxData = (SkillboxPage: React.FC<SkillboxPropType>) => function 
                     progressBody.append('option', chapter.id.toString());
                     progressBody.append('content', '2');
                     const { result: progress } = await POST('getUserProgress', progressBody);
-    
+                    
                     return parseInt(progress)
                 })
             );
 
             var progress = 0
-            chapterWiseProgress.forEach(chapterProgress => {
-                if(chapterProgress === 2){
+            chapters.forEach((chapter: SkillBoxChapterInterface, index: number) => {
+                chapter.progress = chapterWiseProgress[index]
+                if (chapter.progress === 2) {
                     progress++
                 }
             });
 
-            return {chapters:chapters, progress:progress * 100 /chapters.length}
+            return { chapters: chapters, progress: progress * 100 / chapters.length }
         }));
 
         result.forEach((course, index) => {
@@ -91,8 +93,62 @@ const WithSkillboxData = (SkillboxPage: React.FC<SkillboxPropType>) => function 
         return response.status
     }
 
+    const setChapterNote = async (chapterId: number, note: string) => {
+        const body = new URLSearchParams();
+        body.append('userToken', token || '');
+        body.append('option', chapterId.toString());
+        body.append('content', note.toString());
+        await POST('setChapterNote', body);
+    }
+
+    const getChapterNote = async (chapterId: number) => {
+        const progressBody = new URLSearchParams();
+        progressBody.append('userToken', token || '');
+        progressBody.append('option', chapterId.toString());
+        const { result: note } = await POST('getChapterNote', progressBody);
+        return note
+    }
+
+    const getChapterHistory = async (chapterId: number) => {
+        const sectionsBody = new URLSearchParams();
+        sectionsBody.append('option', chapterId.toString());
+        const { result: sections } = await POST('getSections', sectionsBody) || { result: [] };
+
+
+        const sectionHistory: ParagraphInterface[][] = await Promise.all(
+            sections.map(async (section: any) => {
+
+                const sectionHistoryBody = new URLSearchParams()
+                sectionHistoryBody.append('userToken', token || '')
+                sectionHistoryBody.append('option', section.id)
+                const { content: history } = await POST('getSectionHistory', sectionHistoryBody) || { content: [] }
+
+                const paragraphs: ParagraphInterface[] = await Promise.all(
+                    history.map(async (paragraphId: any) => {
+                        const body = new URLSearchParams();
+                        body.append('option', paragraphId.toString());
+                        const { result: paragraph } = await POST('getParagraph', body) || { result: [] }
+                        return paragraph
+                    })
+                )
+                return paragraphs
+            })
+        );
+
+        let chapterHistory: ParagraphInterface[] = []
+        sectionHistory.forEach(item => {
+            chapterHistory = [...chapterHistory, ...item]
+        })
+        return chapterHistory
+
+    }
+    const getChapterMaterial = async (chapterId: number) => {
+
+    }
+
     return (
-        <SkillboxPage courses={courses} addUserCourse={addUserCourse} deleteUserCourse={deleteUserCourse} />
+        <SkillboxPage courses={courses} addUserCourse={addUserCourse} deleteUserCourse={deleteUserCourse} setChapterNote={setChapterNote}
+          getChapterNote={getChapterNote} getChapterHistory={getChapterHistory} getChapterMaterial={getChapterMaterial}/>
     )
 }
 

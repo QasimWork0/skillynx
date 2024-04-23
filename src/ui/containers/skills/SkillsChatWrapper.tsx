@@ -2,9 +2,11 @@ import React, { useCallback, useEffect, useState } from 'react'
 import { POST } from 'api/index'
 import { ParagraphInterface } from 'entities/interfaces'
 import ChatComponent from 'ui/components/chat/ChatComponent'
+import useAlert from 'hooks/AlertHook'
 
 const SkillsChatWrapper = ({ active, updateProgress }: any) => {
 
+    const { setAlert } = useAlert()
     const token = window.localStorage.getItem("currentUserToken")
     const [nodesData, setNodesData] = useState<ParagraphInterface[]>([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -38,7 +40,7 @@ const SkillsChatWrapper = ({ active, updateProgress }: any) => {
                 })
             );
 
-            for (let i = 0; i < chapters.length; i++) {
+            for (var i = 0; i < chapters.length; i++) {
                 if (progressResult[i] === 0 || progressResult[i] === 1) {
                     current.chapter = chapters[i].id
 
@@ -93,7 +95,6 @@ const SkillsChatWrapper = ({ active, updateProgress }: any) => {
     }
 
     const bookmarkChapter = async (id: string, value: number) => {
-        console.log(id, value)
         const body = new URLSearchParams();
         if (token)
             body.append('userToken', token);
@@ -105,15 +106,22 @@ const SkillsChatWrapper = ({ active, updateProgress }: any) => {
         }
     }
 
-    const resetSection = async (sectionId: string) => {
+    const clearProgress = async () => {
         const resetBody = new URLSearchParams();
         resetBody.append('userToken', token || '');
-        resetBody.append('option', sectionId);
-        // const response = await POST('clearSectionUserContent', resetBody)
-        // if (response.status === 200) {
-        //     const paragraphs = await getSectionHistoryParagraphs()
-        //     setNodesData(paragraphs)
-        // }
+        resetBody.append('option', active.id);
+        const response = await POST('clearUserProgress', resetBody)
+        if (response.status === 200) {
+            if (timeoutId) {
+                clearTimeout(timeoutId);
+            }
+            setIsLoading(true)
+            setCalledNodes([])
+            setNodesData([])
+            setChapter(undefined)
+            await getChatData(active.id)
+            setAlert({ color: 'success', message: 'Course progress cleared!' })
+        }
     }
 
     const getSectionHistoryParagraphs = async (sectionId: string) => {
@@ -123,16 +131,15 @@ const SkillsChatWrapper = ({ active, updateProgress }: any) => {
         const historyResp = await POST('getSectionHistory', historyBody)
         let history = historyResp.content
 
-        const paragraphPromise = history.map(async (paragraphId: any) => {
-            const body = new URLSearchParams();
-            body.append('option', paragraphId.toString());
-            const paragraphsResp = await POST('getParagraph', body);
-            let paragraph = paragraphsResp.result;
-            return paragraph
-        });
-
-        // Wait for all promises to resolve
-        const paragraphs: ParagraphInterface[] = await Promise.all(paragraphPromise)
+        const paragraphs: ParagraphInterface[] = await Promise.all(
+            history.map(async (paragraphId: any) => {
+                const body = new URLSearchParams();
+                body.append('option', paragraphId.toString());
+                const paragraphsResp = await POST('getParagraph', body);
+                let paragraph = paragraphsResp.result;
+                return paragraph
+            })
+        )
         return paragraphs
     }
 
@@ -161,7 +168,7 @@ const SkillsChatWrapper = ({ active, updateProgress }: any) => {
         }, remainingDelay)
         setTimeoutId(id)
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
     const markParagraph = async (paragraphId: string) => {
@@ -197,7 +204,7 @@ const SkillsChatWrapper = ({ active, updateProgress }: any) => {
     useEffect(() => {
         if (nodesData && nodesData.length > 0) {
             const last = nodesData[nodesData.length - 1]
-            if (last.type !== 'next' && last.outputs && last.outputs.split(',').length===1) {
+            if (last.type !== 'next' && last.outputs && last.outputs.split(',').length === 1) {
                 if (!calledNodes.includes(last.id)) {
                     setCalledNodes(calledNodes => [...calledNodes, last.id])
                     getNext(last.outputs);
@@ -225,7 +232,7 @@ const SkillsChatWrapper = ({ active, updateProgress }: any) => {
                     sendDisabled
                     chapter={chapter}
                     bookmarkChapter={bookmarkChapter}
-                    resetSection={resetSection}
+                    clearProgress={clearProgress}
                     handleNext={getNext}
                     isLoading={isLoading}
                     handleFeedback={handleFeedback}

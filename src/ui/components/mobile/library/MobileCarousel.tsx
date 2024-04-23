@@ -53,8 +53,12 @@ export default function MobileCarousel({ title, onShowMore, children, count = 2 
     const { state: textSize } = useContext(TextSizeContext)
 
     const responsive = {
+        tablet: {
+            breakpoint: { max: MobileWidth, min: MobileWidth/1.4 },
+            items: count+1,
+        },
         mobile: {
-            breakpoint: { max: MobileWidth, min: 0 },
+            breakpoint: { max: MobileWidth/1.4, min: 0 },
             items: count,
         },
     };

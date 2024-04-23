@@ -18,7 +18,7 @@ const WrapperBox = styled(Box)<{ backgroundimagenumber: string }>(({ theme, back
     display: 'flex',
     flexDirection: 'column',
     width: '100%',
-    bottom: '7rem',
+    height:'calc(100vh - 7rem)',
     zIndex: '999',
     overflowY: 'auto',
 }))
@@ -55,7 +55,7 @@ const SubScreenMobile = ({ data, onClose, children }: any) => {
                 <HeaderText fontSize={TextSizes[textSize].title3}>{t(data.title)}</HeaderText>
                 <ImageComponent src={theme.palette.mode==='light'? data.thumbnail:data.thumbnailDark} alt='image' width='3.6rem' height='3.6rem' borderRadius='50%' />
             </HeaderBox>
-            <Box sx={{overflowY:'auto', padding:'0 0.7rem'}}>
+            <Box sx={{overflowY:'auto', padding:'0 0.7rem', flexGrow:1, overflowX:'clip'}}>
                 {children}
             </Box>
         </WrapperBox>

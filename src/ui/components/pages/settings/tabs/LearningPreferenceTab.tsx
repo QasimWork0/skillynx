@@ -40,16 +40,21 @@ const BackgroundComponent = () => {
     backgroundImage === num ? `0.125rem solid ${theme.palette.primary.main}` : ''
   )
 
+  const setBackground = (num:1|2|3|4) => {
+    setBackgroundImage(num)
+    window.localStorage.setItem('background', num.toString())
+  }
+
   return (
     <BackgroundBox>
-      <BackgroundButton border={getBorder(1)} onClick={()=>{setBackgroundImage(1)}} color="primary">
+      <BackgroundButton border={getBorder(1)} onClick={()=>{setBackground(1)}} color="primary">
         <ImageComponent src={BackgroundImage1} alt='bachground1' width="100%" height="100%" borderRadius="0.5rem" transform="scale(4)"/>
       </BackgroundButton>
-      <BackgroundButton border={getBorder(2)} onClick={()=>{setBackgroundImage(2)}} color="primary">
+      <BackgroundButton border={getBorder(2)} onClick={()=>{setBackground(2)}} color="primary">
         <ImageComponent src={BackgroundImage2} alt='bachground2' width="100%" height="100%" borderRadius="0.5rem" transform="scale(4)"/>
       </BackgroundButton>
-      <BackgroundButton border={getBorder(3)} onClick={()=>{setBackgroundImage(3)}} backgroundColor={theme.palette.secondary.main} color="primary"/>
-      <BackgroundButton border={getBorder(4)} onClick={()=>{setBackgroundImage(4)}} color="primary"/>
+      <BackgroundButton border={getBorder(3)} onClick={()=>{setBackground(3)}} backgroundColor={theme.palette.secondary.main} color="primary"/>
+      <BackgroundButton border={getBorder(4)} onClick={()=>{setBackground(4)}} color="primary"/>
     </BackgroundBox>
   )
 }

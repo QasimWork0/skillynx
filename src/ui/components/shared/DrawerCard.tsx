@@ -80,7 +80,7 @@ const DrawerCard = ({ label, image, imageDark, courseId, menu = [], active = fal
                 <ImageComponent src={theme.palette.mode === 'light' ? image : imageDark} alt='skill' width='3rem' height='3rem' />
                 :
                 <CircularProgressbarWithChildren
-                    value={Math.floor((progress / 12.5)) * 12.5}
+                    value={progress}
                     strokeWidth={6}
                     styles={{
                         root: { width: '3.75rem', height: '3.75rem', display: 'flex' },

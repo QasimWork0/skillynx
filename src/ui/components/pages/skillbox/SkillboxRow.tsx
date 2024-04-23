@@ -14,7 +14,7 @@ import AddSkillDisabledIcon from 'assets/icons/message-circle-disabled.png'
 import MicroLearningCard from "./cards/MicroLearningCard";
 import { TextSizes } from "entities/constants";
 import { TextSizeContext } from "data/index";
-import { SkillboxCourseInterface } from "entities/interfaces";
+import { ParagraphInterface, SkillboxCourseInterface } from "entities/interfaces";
 import ConfirmationModal from "ui/components/shared/ConfirmationModal";
 
 const BorderLinearProgress = styled(LinearProgress)(({ theme }) => ({
@@ -57,28 +57,34 @@ const GridItem = styled(Grid)(() => ({
   gap: "1.5rem",
 }));
 
-const ExpandBox = styled(Box)(() => ({
+const ExpandBox = styled(Box)(({theme}) => ({
+  backgroundColor:theme.palette.mode === 'light' ? theme.palette.grey[900] : theme.palette.grey[600],
   display: "flex",
   flexDirection: "column",
   marginBottom: '0.2rem'
 }));
 
-const SkillboxRow = ({ skill, addUserCourse, deleteUserCourse, expanded, handleExpand, handleExpandClose }: {
-  skill: SkillboxCourseInterface,
-  addUserCourse: (courseId: number) => Promise<number>,
-  deleteUserCourse: (courseId: number) => Promise<number>
-  expanded?: SkillboxCourseInterface
-  handleExpand: (skill:SkillboxCourseInterface)=>void
-  handleExpandClose: ()=>void
-}) => {
+const SkillboxRow = ({ skill, addUserCourse, deleteUserCourse, expanded, handleExpand, handleExpandClose, setChapterNote,
+  getChapterNote, getChapterHistory, getChapterMaterial }: {
+    skill: SkillboxCourseInterface,
+    addUserCourse: (courseId: number) => Promise<number>,
+    deleteUserCourse: (courseId: number) => Promise<number>
+    expanded?: SkillboxCourseInterface
+    handleExpand: (skill: SkillboxCourseInterface) => void
+    handleExpandClose: () => void
+    setChapterNote: (chapterId: number, note: string) => Promise<void>;
+    getChapterNote: (chapterId: number) => Promise<string>
+    getChapterHistory: (chapterId: number) => Promise<ParagraphInterface[]>
+    getChapterMaterial: (chapterId: number) => void
+  }) => {
   const { state: textSize } = useContext(TextSizeContext)
   const [deleteConfirmationModal, setDeleteConfirmationModal] = useState(false);
   const theme = useTheme()
 
   return (
     <Box>
-      <Wrapper container sx={{ borderRadius: expanded===skill ? '8px 8px 0 0' : '2px' }}>
-        <GridItem item lg={5} md={5}>
+      <Wrapper container sx={{ borderRadius: expanded === skill ? '8px 8px 0 0' : '2px' }}>
+        <GridItem item lg={5} md={4.5}>
           <ImageComponent
             src={skill.thumbnail}
             alt="Logo"
@@ -92,10 +98,10 @@ const SkillboxRow = ({ skill, addUserCourse, deleteUserCourse, expanded, handleE
           <BorderLinearProgress variant="determinate" value={skill.progress} />
           <Progress fontSize={TextSizes[textSize].callout}>{skill.progress.toFixed(0)}%</Progress>
         </GridItem>
-        <GridItem item lg={1} md={2} sx={{ justifyContent: 'flex-end' }}>
-          <IconButton onClick={() => addUserCourse(skill.id)} disabled={skill.state === 1}>
+        <GridItem item lg={1} md={2.5} sx={{ justifyContent: 'flex-end', [theme.breakpoints.down('lg')]: { gap: '0.8rem' } }}>
+          <IconButton onClick={() => addUserCourse(skill.id)} disabled={skill.state.toString() === '1'}>
             <ImageComponent
-              src={skill.state === 1 ? AddSkillDisabledIcon : AddSkillIcon}
+              src={skill.state.toString() === '1' ? AddSkillDisabledIcon : AddSkillIcon}
               alt="add"
               width="1.5rem"
               height="1.5rem"
@@ -110,24 +116,25 @@ const SkillboxRow = ({ skill, addUserCourse, deleteUserCourse, expanded, handleE
               height="1.5rem"
             />
           </IconButton>
-          <IconButton onClick={expanded===skill? handleExpandClose:()=>handleExpand(skill)}>
+          <IconButton onClick={expanded === skill ? handleExpandClose : () => handleExpand(skill)}>
             <ImageComponent
-              src={theme.palette.mode === 'light' ? (expanded===skill ? UpIcon : DownIcon) : (expanded===skill ? UpIconDark : DownIconDark)}
-              alt={expanded===skill ? "hide" : "expand"}
+              src={theme.palette.mode === 'light' ? (expanded === skill ? UpIcon : DownIcon) : (expanded === skill ? UpIconDark : DownIconDark)}
+              alt={expanded === skill ? "hide" : "expand"}
               width="1.5rem"
               height="1.5rem"
             />
           </IconButton>
         </GridItem >
       </Wrapper>
-      {expanded===skill ?
+      {expanded === skill ?
         <>
           <Divider sx={{ height: '2px', backgroundColor: theme.palette.mode === 'light' ? theme.palette.primary.main : theme.palette.grey[900] }} />
           <ExpandBox>
             {
               skill.chapters.map((chapter: any, index: number) => (
                 <>
-                  <MicroLearningCard key={chapter.title} data={chapter} num={index + 1} />
+                  <MicroLearningCard key={chapter.title} data={chapter} num={index + 1} saveNote={async (note: string) => await setChapterNote(chapter.id, note)}
+                    getNote={async ()=> await getChapterNote(chapter.id)} getChapterHistory={async ()=> await getChapterHistory(chapter.id)} getChapterMateria={async ()=> await getChapterMaterial(chapter.id)} />
                   <Divider />
                 </>
               ))

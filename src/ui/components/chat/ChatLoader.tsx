@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react'
 import { Box, styled } from '@mui/material'
+import useScreenSize from 'hooks/ScreenSize'
+import { MobileWidth } from 'entities/constants'
 
 const Wrapper = styled(Box)(({ theme }) => ({
-    backgroundColor: theme.palette.common.white,
+    backgroundColor: theme.palette.mode==='light'? theme.palette.common.white:theme.palette.grey[600],
     display: 'flex',
     width: '5.5rem',
     height: '2.5rem',
@@ -12,12 +14,12 @@ const Wrapper = styled(Box)(({ theme }) => ({
     flexShrink: 0,
     borderRadius: '2.625rem',
     margin: '0.5rem 0 0 3.8rem',
-    boxShadow: '0px 4px 7px 0px rgba(193, 193, 193, 0.25)',
+    boxShadow: '0px 0px 16px rgba(0, 0, 0, 0.1)',
     gap:'0.44rem'
 }))
 
 const Dot = styled(Box)<{selected?:string}>(({ theme, selected }) => ({
-    backgroundColor: '#234A5A',
+    backgroundColor: theme.palette.mode==='light'? '#234A5A': '#FCFCFC',
     width: '0.5rem',
     height: '0.5rem',
     flexShrink: 0,
@@ -26,8 +28,9 @@ const Dot = styled(Box)<{selected?:string}>(({ theme, selected }) => ({
     transition: 'opacity 0.3s ease-in-out'
 }))
 
-const ChatLoader = () => {
+const ChatLoader = ({isInModal}:any) => {
     const [selectedDot, setSelectedDot] = useState(1);
+    const {width} = useScreenSize() 
 
     useEffect(() => {
         const intervalId = setInterval(() => {
@@ -40,7 +43,7 @@ const ChatLoader = () => {
     }, []);
 
     return (
-        <Wrapper>
+        <Wrapper sx={width<=MobileWidth || isInModal?{margin:'0.5rem'}:{}}>
             <Dot selected={selectedDot===1? 'true':undefined}/>
             <Dot selected={selectedDot===2? 'true':undefined}/>
             <Dot selected={selectedDot===3? 'true':undefined}/>

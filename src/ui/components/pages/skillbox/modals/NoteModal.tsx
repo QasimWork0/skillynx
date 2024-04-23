@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Box, TextField, styled, useTheme } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import { TextSizeContext } from "data/index";
@@ -55,22 +55,41 @@ const ButtonBox = styled(Box)(({ theme }) => ({
     alignSelf: 'flex-end',
 }));
 
-const NoteModal = ({ closeModal }: any) => {
+const NoteModal = ({ closeModal, saveNote, getNote }:
+    {
+        closeModal: () => void,
+        saveNote: (note: string) => void,
+        getNote: () => Promise<string>
+    }) => {
     const { t } = useTranslation()
     const theme = useTheme()
     const { state: textSize } = useContext(TextSizeContext)
     const { width } = useScreenSize()
+    const [note, setNote] = useState('');
 
     const handleRemove = () => {
+        closeModal()
     };
 
     const handleSave = () => {
+        saveNote(encodeURIComponent(note))
+        closeModal()
     }
+
+    const getNoteValue = async () => {
+        const value = await getNote()
+        setNote(decodeURIComponent(value))
+    }
+
+    useEffect(() => {
+        getNoteValue()
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     return (
         <CustomModal closeModal={closeModal} width={width > MobileWidth ? '32rem' : '23.75rem'} height='23.5625rem' title='Write Note'>
             <ContentBox>
-                <NoteBox placeholder={t('Place your personal notes for this microlearning….')} fullWidth multiline rows={8}
+                <NoteBox placeholder={t('Place your personal notes for this microlearning….')} fullWidth multiline rows={8} value={note} onChange={(e) => setNote(e.target.value)}
                     variant="standard" InputProps={{ sx: { fontSize: TextSizes[textSize].subhead }, disableUnderline: true }} />
                 <ButtonBox>
                     <SubmitButton color='primary' onClick={handleSave}>Save</SubmitButton>

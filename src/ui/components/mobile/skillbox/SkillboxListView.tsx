@@ -8,7 +8,7 @@ import ImageComponent from 'ui/components/shared/ImageComponent'
 import MoreIcon from 'assets/icons/More-Vertical.png'
 import MoreIconDark from 'assets/icons/More-Vertical-dark.png'
 import DeleteIcon from 'assets/icons/trash_white.png'
-import { SkillboxCourseInterface } from 'entities/interfaces'
+import { ParagraphInterface, SkillboxCourseInterface } from 'entities/interfaces'
 import MicroLearningListView from './microLearning/MicroLearningListView'
 import SkillboxRowMobile from './SkillboxRowMobile'
 import ConfirmationModal from 'ui/components/shared/ConfirmationModal'
@@ -21,7 +21,7 @@ const SkillboxMobileWrapper = styled(Box)(({ theme }) => ({
 }))
 
 const ListElement = styled(ListItem)<{ more?: string }>(({ theme, more }) => ({
-    backgroundColor: more ? theme.palette.grey[800] : theme.palette.mode==='light'? theme.palette.common.white: theme.palette.grey[900],
+    backgroundColor: more ? theme.palette.grey[800] : theme.palette.mode === 'light' ? theme.palette.common.white : theme.palette.grey[900],
     height: '7.25rem',
     padding: '0 0.75rem 0 0',
     borderRadius: '0rem 0rem 1.5rem 0rem',
@@ -62,20 +62,25 @@ const DeleteBox = styled(Button)(({ theme }) => ({
 }))
 
 const StyledList = styled(List)(({ theme }) => ({
-    backgroundColor: theme.palette.mode==='light'? theme.palette.common.white: theme.palette.grey[900],
+    backgroundColor: theme.palette.mode === 'light' ? theme.palette.common.white : theme.palette.grey[900],
     padding: 0,
     flexGrow: 1,
 }))
 
 
-const SkillboxListView = ({ skills, addUserCourse, deleteUserCourse, expanded, handleExpand, handleExpandClose }: {
-    skills: SkillboxCourseInterface[],
-    addUserCourse: (courseId: number) => Promise<number>,
-    deleteUserCourse: (courseId: number) => Promise<number>
-    expanded?: SkillboxCourseInterface
-    handleExpand: (skill: SkillboxCourseInterface) => void
-    handleExpandClose: () => void
-}) => {
+const SkillboxListView = ({ skills, addUserCourse, deleteUserCourse, expanded, handleExpand, handleExpandClose, setChapterNote,
+    getChapterNote, getChapterHistory, getChapterMaterial }: {
+        skills: SkillboxCourseInterface[],
+        addUserCourse: (courseId: number) => Promise<number>,
+        deleteUserCourse: (courseId: number) => Promise<number>
+        expanded?: SkillboxCourseInterface
+        handleExpand: (skill: SkillboxCourseInterface) => void
+        handleExpandClose: () => void
+        setChapterNote: (chapterId: number, note: string) => Promise<void>;
+        getChapterNote: (chapterId: number) => Promise<string>
+        getChapterHistory: (chapterId: number) => Promise<ParagraphInterface[]>
+        getChapterMaterial: (chapterId: number) => void
+    }) => {
     const theme = useTheme()
     const { t } = useTranslation()
     const { state: textSize } = useContext(TextSizeContext)
@@ -98,7 +103,7 @@ const SkillboxListView = ({ skills, addUserCourse, deleteUserCourse, expanded, h
                             <ListElementBox key={skill.id}>
                                 <ListElement more={skill.title === moreOptionLabel ? 'true' : undefined} sx={{ marginRight: '-1.312rem' }}>
                                     <ListButton onClick={() => handleExpand(skill)} >
-                                        <SkillboxRowMobile label={skill.title} image={skill.thumbnail} progress={40} selected={skill.title === moreOptionLabel} />
+                                        <SkillboxRowMobile label={skill.title} image={skill.thumbnail} progress={skill.progress} selected={skill.title === moreOptionLabel} />
                                     </ListButton>
                                     <IconButton onClick={() => handleMore(skill.title)}>
                                         <ImageComponent src={theme.palette.mode === 'light' ? MoreIcon : MoreIconDark} alt='more' width='1.5rem' height='1.5rem' />
@@ -122,7 +127,8 @@ const SkillboxListView = ({ skills, addUserCourse, deleteUserCourse, expanded, h
             </StyledList>
             {expanded && (
                 <SubScreenMobile onClose={handleExpandClose} data={expanded}>
-                    <MicroLearningListView microlearning={expanded.chapters} />
+                    <MicroLearningListView microlearning={expanded.chapters} setCourseNote={setChapterNote} 
+                    getChapterNote={getChapterNote} getChapterHistory={getChapterHistory} getChapterMaterial={getChapterMaterial}/>
                 </SubScreenMobile>
             )}
         </SkillboxMobileWrapper>

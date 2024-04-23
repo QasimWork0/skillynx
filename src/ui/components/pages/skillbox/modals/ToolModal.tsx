@@ -43,7 +43,7 @@ const FileBox = styled(Box)(({ theme }) => ({
     gap: '1rem',
 }));
 
-const ToolModal = ({ closeModal }: any) => {
+const ToolModal = ({ closeModal }: {closeModal:()=>void, getChapterMaterial: () => Promise<void>}) => {
     const { t } = useTranslation()
     const { state: textSize } = useContext(TextSizeContext)
     const { width } = useScreenSize()

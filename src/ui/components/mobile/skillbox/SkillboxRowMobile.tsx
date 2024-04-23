@@ -8,16 +8,13 @@ import { TextSizes } from "entities/constants";
 import { TextSizeContext } from "data/index";
 
 const BorderLinearProgress = styled(LinearProgress)(({ theme }) => ({
-  height: "0.7rem",
+  height: "1.03125rem",
   flexGrow: 1,
   borderRadius: "1rem",
   border: `1px solid ${theme.palette.primary.main}`,
   [`&.${linearProgressClasses.colorPrimary}`]: {
     backgroundColor: theme.palette.common.white,
   },
-  [theme.breakpoints.down('md')]:{
-    height: "1.03125rem",
-  }
 }));
 
 const Wrapper = styled(Box)(() => ({
@@ -53,6 +50,7 @@ const Label = styled(Typography)(() => ({
 
 const Progress = styled(Typography)(() => ({
   fontWeight: 400,
+  width:'2rem'
 }));
 
 const SkillboxRowMobile = ({ label, image, progress, selected, date }: any) => {
@@ -66,7 +64,7 @@ const SkillboxRowMobile = ({ label, image, progress, selected, date }: any) => {
           fontWeight={selected ? 700 : 500}> {label} </Label>
         <HorizontalBox>
           <BorderLinearProgress variant="determinate" value={progress} />
-          <Progress fontSize={TextSizes[textSize].callout}>{progress}%</Progress>
+          <Progress fontSize={TextSizes[textSize].callout}>{progress.toFixed(0)}%</Progress>
         </HorizontalBox>
       </VerticalBox>
     </Wrapper>

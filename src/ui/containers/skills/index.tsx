@@ -75,7 +75,7 @@ const WithSkillsData = (SkillsPage: React.FC<SkillsPropType>) => function WithPr
     }
 
     const updateProgress = () => {
-        getCourses()
+        // getCourses()
     }
 
     return (

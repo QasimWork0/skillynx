@@ -1,5 +1,5 @@
 import React, { useContext, useState } from "react";
-import { Box, IconButton, Typography, styled, useTheme, } from "@mui/material";
+import { Box, IconButton, Typography, alpha, styled, useTheme, } from "@mui/material";
 import ImageComponent from "ui/components/shared/ImageComponent";
 import { TextSizeContext } from "data/index";
 import { TextSizes } from "entities/constants";
@@ -15,13 +15,15 @@ import SkillModal from "ui/components/pages/skillbox/modals/SkillModal";
 import NoteModal from "ui/components/pages/skillbox/modals/NoteModal";
 import ToolModal from "ui/components/pages/skillbox/modals/ToolModal";
 
-const Wrapper = styled(Box)(({ theme }) => ({
+const Wrapper = styled(Box)<{active?:string}>(({ theme, active }) => ({
   display: 'flex',
   height: '7.25rem',
   padding: '0.25rem 0.75rem 0.25rem 1.5rem',
   justifyContent: 'space-between',
   alignItems: 'center',
   flexShrink: 0,
+  backgroundColor: active&& alpha(theme.palette.primary.main, 0.2),
+  borderLeft: `4px solid ${active? alpha(theme.palette.primary.main, 0.6):'transparent'}`,
 }));
 
 const TitleBox = styled(Box)(() => ({
@@ -50,7 +52,7 @@ const Topic = styled(Typography)(({ theme }) => ({
   fontWeight: 500,
 }));
 
-const MicroLearningMobileCard = ({ data, num }: any) => {
+const MicroLearningMobileCard = ({ data, num, saveNote, getNote, getChapterHistory, getChapterMaterial }: any) => {
   const theme = useTheme()
   const { t } = useTranslation()
   const { state: textSize } = useContext(TextSizeContext)
@@ -59,7 +61,7 @@ const MicroLearningMobileCard = ({ data, num }: any) => {
   const [toolModalOpen, setToolModalOpen] = useState(false);
 
   return (
-    <Wrapper>
+    <Wrapper active={data.progress===1?'true':undefined}>
       <TitleBox>
         <MicrolearningBox>
           {data.isBookmarked && <ImageComponent src={BookmarkIcon} alt="important" width="1.5rem" height="1.5rem" />}
@@ -93,9 +95,9 @@ const MicroLearningMobileCard = ({ data, num }: any) => {
           />
         </IconButton>
       </ButtonsBox>
-      {skillModalOpen && <SkillModal closeModal={() => setSkillModalOpen(false)} />}
-      {noteModalOpen && <NoteModal closeModal={() => setNoteModalOpen(false)} />}
-      {toolModalOpen && <ToolModal closeModal={() => setToolModalOpen(false)} />}
+      {skillModalOpen && <SkillModal closeModal={() => setSkillModalOpen(false)} getChapterHistory={getChapterHistory} />}
+      {noteModalOpen && <NoteModal closeModal={() => setNoteModalOpen(false)} saveNote={saveNote} getNote={getNote} />}
+      {toolModalOpen && <ToolModal closeModal={() => setToolModalOpen(false)} getChapterMaterial={getChapterMaterial} />}
     </Wrapper>
   );
 };

@@ -32,7 +32,7 @@ const SkillboxWrapper = styled(Box)(({ theme }) => ({
   },
 }));
 
-const Skillbox = ({ courses, addUserCourse, deleteUserCourse }: SkillboxPropType) => {
+const Skillbox = ({ courses, addUserCourse, deleteUserCourse, setChapterNote: setCourseNote, getChapterNote, getChapterHistory, getChapterMaterial }: SkillboxPropType) => {
   const { width } = useScreenSize()
   const [expandedSkill, setExpandedSkill] = useState<SkillboxCourseInterface>();
 
@@ -52,13 +52,15 @@ const Skillbox = ({ courses, addUserCourse, deleteUserCourse }: SkillboxPropType
           <SkillboxWrapper>
             {courses.map((skill) => (
               <SkillboxRow key={skill.id} skill={skill} addUserCourse={addUserCourse} deleteUserCourse={deleteUserCourse}
-                expanded={expandedSkill} handleExpand={handleExpand} handleExpandClose={handleExpandClose} />
+                expanded={expandedSkill} handleExpand={handleExpand} handleExpandClose={handleExpandClose} setChapterNote={setCourseNote}
+                getChapterNote={getChapterNote} getChapterHistory={getChapterHistory} getChapterMaterial={getChapterMaterial} />
             ))}
           </SkillboxWrapper>
         </>
       ) : (
         <SkillboxListView skills={courses} addUserCourse={addUserCourse} deleteUserCourse={deleteUserCourse}
-          expanded={expandedSkill} handleExpand={handleExpand} handleExpandClose={handleExpandClose} />
+          expanded={expandedSkill} handleExpand={handleExpand} handleExpandClose={handleExpandClose} setChapterNote={setCourseNote}
+          getChapterNote={getChapterNote} getChapterHistory={getChapterHistory} getChapterMaterial={getChapterMaterial} />
       )}
     </>
   )

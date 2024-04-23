@@ -39,7 +39,7 @@ const Skills = ({ courses, deleteUserCourse, updateProgress}: SkillsPropType) =>
           <SkillsDesktop options={courses} active={active} setActive={setActive} deleteUserCourse={deleteUserCourse} updateProgress={updateProgress}/>
         </>
       ) : (
-        <SkillsListView options={courses} active={active} setActive={setActive} deleteUserCourse={deleteUserCourse} />
+        <SkillsListView options={courses} active={active} setActive={setActive} deleteUserCourse={deleteUserCourse} updateProgress={updateProgress}/>
       )}
     </SkillsWrapper>
   );

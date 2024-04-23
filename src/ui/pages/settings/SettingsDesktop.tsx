@@ -19,7 +19,7 @@ const ContentWrapper = styled(Box)(({ theme }) => ({
       height: '0.4rem',
     },
     "&::-webkit-scrollbar-track": {
-      background: theme.palette.secondary.main,
+      background: 'transparent',
     },
     "&::-webkit-scrollbar-thumb": {
       background: theme.palette.primary.dark,

@@ -55,6 +55,10 @@ export interface ChapterInterface {
   isBookmarked?: boolean;
 }
 
+export interface SkillBoxChapterInterface extends ChapterInterface {
+  progress: number,
+}
+
 export interface LibraryCourseInterface extends SkillCourseInterface {
   description: string;
   subtitle: string;
@@ -65,7 +69,7 @@ export interface LibraryCourseInterface extends SkillCourseInterface {
 }
 
 export interface SkillboxCourseInterface extends SkillCourseInterface {
-  chapters: ChapterInterface[];
+  chapters: SkillBoxChapterInterface[];
 }
 
 export interface HeaderTitleType {
@@ -122,6 +126,10 @@ export interface SkillboxPropType {
   courses: SkillboxCourseInterface[];
   addUserCourse: (courseId: number) => Promise<number>;
   deleteUserCourse: (courseId: number) => Promise<number>;
+  setChapterNote: (chapterId: number, note:string) => Promise<void>;
+  getChapterNote: (chapterId: number) => Promise<string>
+  getChapterHistory: (chapterId: number) => Promise<ParagraphInterface[]>
+  getChapterMaterial: (chapterId: number) => void
 }
 
 export interface LoginPropType {
@@ -181,9 +189,8 @@ export interface ChatComponentPropType {
   isHome?: boolean;
   reportAllowed?: boolean;
   sendDisabled?: boolean;
-  resetSection?: (sectionId: string) => void,
+  clearProgress?: () => void,
   handleFeedback?: ()=>void
   nextSection?: ()=>void
-  isLastSection?: boolean
 }
 /*** --- ***/

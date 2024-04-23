@@ -36,7 +36,10 @@ const StyledButton = styled(Button)<{ ishome?: string }>(
     marginTop: ishome && '-3rem',
     boxShadow: ishome ? '0px 2px 4px rgba(0, 0, 0, 0.2)':'',
     ':hover':{
-      backgroundColor: theme.palette.secondary.dark,
+      // backgroundColor: theme.palette.secondary.dark,
+    },
+    ':focus':{
+      backgroundColor: ishome && theme.palette.mode==='dark'? theme.palette.grey[800] : theme.palette.mode==='dark'? theme.palette.secondary.main: theme.palette.grey[900],
     }
   })
 );
@@ -64,6 +67,7 @@ const NavButton = ({
       sx={{
         fontSize:TextSizes[textSize].caption2,
         color: isActive? theme.palette.primary.main: '#949494'
+        
       }}
     
     >

@@ -14,7 +14,8 @@ const WrapperButton = styled(Button)(({ theme }) => ({
     borderRadius: '1rem',
     padding: 0,
     flexShrink: 0,
-    textTransform: 'none'
+    textTransform: 'none',
+    maxWidth:'100%',
 }))
 
 const TopLabel = styled(Typography)(({ theme }) => ({
@@ -50,7 +51,7 @@ const LibrarySkillCardMobile = ({ data, isCategory = false }: { data: LibraryCou
     return (
         <>
             {isCategory && <TopLabel fontSize={TextSizes[textSize].callout}>{data.title}</TopLabel>}
-            <WrapperButton onClick={() => setSelectedSkill(data)}  sx={{width:isCategory?'100%':'11.1875rem', height:isCategory?'16.25rem':'17.5625rem'}}>
+            <WrapperButton onClick={() => setSelectedSkill(data)}  sx={{width:isCategory?'100%':'calc(100% - 0.4rem)', height:isCategory?'16.25rem':'17.5625rem', maxWidth:isCategory?'100%':'11.5rem'}}>
                 <ImageComponent src={data.image} alt='image' width='100%' height={isCategory?'100%':'13.5rem'} borderRadius={isCategory?'1rem':'1rem 1rem 0 0'} objectFit/>
                 {!isCategory &&
                     <LabelBox>
